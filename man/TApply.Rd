@@ -3,12 +3,15 @@
 \docType{methods}
 \name{TApply}
 \alias{TApply}
+\alias{TApply,StQ,StQT-method}
 \alias{TApply,data.table,StQT-method}
 \title{Aplica una transformación a una tabla de datos.}
 \usage{
 TApply(x, Tr)
 
 \S4method{TApply}{data.table,StQT}(x, Tr)
+
+\S4method{TApply}{StQ,StQT}(x, Tr)
 }
 \arguments{
 \item{x}{Objeto de clase \linkS4class{StQ} o \linkS4class{data.table} con los
