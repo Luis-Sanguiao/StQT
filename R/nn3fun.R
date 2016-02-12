@@ -31,7 +31,8 @@ nn3fun<-function(id,stratum,values,donor,nvar) {
     auxvector<-ordereddonors-c(ordereddonors[1],ordereddonors)[-length(ordereddonors)-1]
     countneighbours[strreceivers==str][orderedreceivers]<-
       (1:length(auxvector))-cummax(as.numeric(auxvector!=0)*(0:(length(auxvector)-1)))
-    idneighbours[strreceivers==str]<-iddonors[strdonors==str][selecteddonors]
+    if (length(selecteddonors)) idneighbours[strreceivers==str]<-iddonors[strdonors==str][selecteddonors]
+    else idneighbours[strreceivers==str]<-NA
   }
   output.id<-rep(NA,length=length(id))
   output.count<-rep(NA,length=length(id))
