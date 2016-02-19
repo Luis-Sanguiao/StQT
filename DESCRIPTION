@@ -12,9 +12,11 @@ RoxygenNote: 5.0.1
 Collate:
     'StQT-class.R'
     'NewStQT.R'
+    'RemoveInternal.R'
     'getRules.R'
     'TApply.R'
     'getFunctions.R'
     'nn3fun.R'
+    'subset.StQT.R'
 Imports:
     data.table

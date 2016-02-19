@@ -27,12 +27,12 @@ setMethod(
 
     x[is.na(x)]<-""
 
-    if (!all(unlist(lapply(setdiff(x$fun,c("FunDelRow","FunDelCol","FunAutoLink")),exists))))
+    if (!all(unlist(lapply(RemoveInternal(x$fun),exists))))
       stop('[StQT Constructor] Una de las funciones no está definida.')
-    if (!all(unlist(lapply(mget(setdiff(x$fun,c("FunDelRow","FunDelCol","FunAutoLink")),inherits=TRUE),is.function))))
+    if (!all(unlist(lapply(mget(RemoveInternal(x$fun),inherits=TRUE),is.function))))
       stop('[StQT Constructor] Una de las funciones está definida como otro tipo de objeto.')
 
-    funcs<-mget(setdiff(x$fun,c("FunDelRow","FunDelCol","FunAutoLink")),inherits=TRUE)
+    funcs<-mget(RemoveInternal(x$fun),inherits=TRUE)
     output <- new(Class = 'StQT', Rules = x, Functions = funcs)
     return(output)
 
