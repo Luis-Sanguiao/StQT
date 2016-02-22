@@ -35,7 +35,7 @@ setGeneric("TApply", function(x,Tr){standardGeneric("TApply")})
 
 #' @rdname TApply
 #'
-#' @include StQT-class.R getRules.R
+#' @include StQT-class.R getRules.R getFunctions.R Utils.R
 #' @import data.table
 #'
 #' @export
@@ -43,27 +43,6 @@ setMethod(
   f = "TApply",
   signature = c("data.table", "StQT"),
   function(x, Tr){
-
-      # La funcion expand separa en un vector las cadenas de caracteres con varias variables
-      expand <- function(string)
-      {
-        string<-unlist(strsplit(string,"[,]"))
-        return(string)
-      }
-
-      # La funcion ssplit extrae las variables a la izquierda o a la derecha de una igualdad
-      ssplit <- function(string,left=TRUE)
-      {
-        string<-expand(string)
-        if(left)
-        {
-          return(unlist(lapply(strsplit(string,"="),"[",i=1)))
-        }
-        else
-        {
-          return(unlist(lapply(strsplit(string,"="),"[",i=2)))
-        }
-      }
 
       # Se extraen las reglas
       rules<-getRules(Tr)
@@ -167,15 +146,15 @@ setMethod(
   f = "TApply",
   signature = c("StQ", "StQT"),
   function(x, Tr){
-    
+
     rules<-getRules(Tr)
     functions<-getFunctions(Tr)
-    
+
     # Se aplican por orden todas las reglas
     for(i in 1:nrow(rules))
     {
-    
-   
+
+
     }
   }
 )
