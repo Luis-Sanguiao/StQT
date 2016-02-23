@@ -16,7 +16,6 @@ Collate:
     'Utils.R'
     'getFunctions.R'
     'TApply.R'
-    'nn3fun.R'
     'subset.StQT.R'
 Imports:
     data.table
