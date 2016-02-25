@@ -23,11 +23,17 @@ setClass(Class = "StQT",
          slots = c(Rules = 'data.frame', Functions = 'list'),
          validity = function(object){
 
-           if (!setequal((names(object@Rules)),c("domain","output","fun","input","by","key"))) stop('[Validity StQT] Conjunto de reglas incorrecto.')
-           if (!all(unlist(lapply(object@Rules,is.character)))) stop('[Validity StQT] Las reglas deben definirse como variables character.')
-           if (!all(unlist(lapply(object@Functions,is.function)))) stop('[Validity StQT] La lista Functions tiene elementos que no son functiones.')
+           if (!setequal((names(object@Rules)),c("domain","output","fun","input","by","key")))
+             stop('[Validity StQT] Conjunto de reglas incorrecto.')
+
+           if (!all(unlist(lapply(object@Rules,is.character))))
+             stop('[Validity StQT] Las reglas deben definirse como variables character.')
+
+           if (!all(unlist(lapply(object@Functions,is.function))))
+             stop('[Validity StQT] La lista Functions tiene elementos que no son functiones.')
+
            if (!setequal(RemoveInternal(object@Rules$fun),names(object@Functions)))
-             if (length(setdiff(RemoveInternal(object@Rules$fun),names(object@Functions)))==0)
+             if (length(setdiff(RemoveInternal(object@Rules$fun),names(object@Functions))) == 0)
                warning('[Validity StQT] En la lista Functions figuran funciones innecesarias.')
              else
                stop('[Validity StQT] Alguna de las funciones no figura en la lista Functions')

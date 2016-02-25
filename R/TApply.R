@@ -42,17 +42,17 @@ setGeneric("TApply", function(x,Tr){standardGeneric("TApply")})
 setMethod(
   f = "TApply",
   signature = c("data.table", "StQT"),
-  function(x, Tr){
+  function(x,Tr){
 
       # Se extraen las reglas
-      rules<-getRules(Tr)
-      functions<-getFunctions(Tr)
+      rules <- getRules(Tr)
+      functions <- getFunctions(Tr)
 
       # Se aplican por orden todas las reglas
-      for(i in 1:nrow(rules))
+      for (i in 1:nrow(rules))
       {
         # Se ordenan los datos
-        if (rules$key[i]!="")
+        if (rules$key[i] != "")
         {
           setkeyv(x,expand(rules$key[i]))
         }
@@ -60,33 +60,33 @@ setMethod(
         # Se comprueban las funciones especiales:
         # FunDelRow elimina las filas que cumplen la condición especificada
 
-        if (rules$fun[i]=="FunDelRow")
+        if (rules$fun[i] == "FunDelRow")
         {
-          x<-do.call("subset",list(x,parse(text=paste("!(",rules$domain[i],")",sep=""))))
+          x <- do.call("subset",list(x,parse(text = paste("!(",rules$domain[i],")",sep = ""))))
           next
         }
 
         # FunDelCol elimina las columnas especificadas en output
-        if (rules$fun[i]=="FunDelCol")
+        if (rules$fun[i] == "FunDelCol")
         {
-          x[,expand(rules$output[i]):=NULL]
+          x[,expand(rules$output[i]) := NULL]
           next
         }
 
         # FunAutoLink extrae información, especificada en el output, de otras filas de la tabla,
         # según los enlaces indicados en el input
-        if (rules$fun[i]=="FunAutoLink")
+        if (rules$fun[i] == "FunAutoLink")
         {
-          link1<-ssplit(rules$input[i],TRUE)
-          link2<-ssplit(rules$input[i],FALSE)
-          selected<-ssplit(rules$output[i],FALSE)
-          fieldnames<-ssplit(rules$output[i],TRUE)
-          xtemp<-x[,mget(link1)]
+          link1 <- ssplit(rules$input[i],TRUE)
+          link2 <- ssplit(rules$input[i],FALSE)
+          selected <- ssplit(rules$output[i],FALSE)
+          fieldnames <- ssplit(rules$output[i],TRUE)
+          xtemp <- x[,mget(link1)]
           setkeyv(xtemp,link1)
           setkeyv(x,link2)
-          xdata<-x[xtemp,mget(selected)]
+          xdata <- x[xtemp,mget(selected)]
           setkeyv(x,link1)
-          x[,fieldnames:=xdata,with=FALSE]
+          x[,fieldnames := xdata,with = FALSE]
           next
         }
 
@@ -95,13 +95,13 @@ setMethod(
 
         if (!grepl("=",rules$output[i]))
         {
-          if (rules$domain[i]=="")
-            do.call(`[`,list(x,j=quote(expand(rules$output[i]):=do.call(functions[[rules$fun[i]]],unname(mget(expand(rules$input[i]))))),
-              by=expand(rules$by[i])))
+          if (rules$domain[i] == "")
+            do.call(`[`,list(x,j = quote(expand(rules$output[i]) := do.call(functions[[rules$fun[i]]],unname(mget(expand(rules$input[i]))))),
+              by = expand(rules$by[i])))
           else
-          do.call(`[`,list(x,i=parse(text=rules$domain[i]),
-              j=quote(expand(rules$output[i]):=do.call(functions[[rules$fun[i]]],unname(mget(expand(rules$input[i]))))),
-              by=expand(rules$by[i])))
+          do.call(`[`,list(x,i = parse(text = rules$domain[i]),
+              j = quote(expand(rules$output[i]) := do.call(functions[[rules$fun[i]]],unname(mget(expand(rules$input[i]))))),
+              by = expand(rules$by[i])))
           next
         }
 
@@ -109,23 +109,23 @@ setMethod(
         else
         {
           # Primero calculamos las filas a insertar
-          vars<-ssplit(rules$output[i],TRUE)
-          values<-ssplit(rules$output[i],FALSE)
+          vars <- ssplit(rules$output[i],TRUE)
+          values <- ssplit(rules$output[i],FALSE)
 
-          if (rules$domain[i]=="")
-            xtemp<-do.call(`[`,list(x,
-                    j=quote(setNames(c(list(),do.call(functions[[rules$fun[i]]],unname(mget(expand(rules$input[i]))))),vars[is.na(values)])),
-                    by=expand(rules$by[i])))
+          if (rules$domain[i] == "")
+            xtemp <- do.call(`[`,list(x,
+                    j = quote(setNames(c(list(),do.call(functions[[rules$fun[i]]],unname(mget(expand(rules$input[i]))))),vars[is.na(values)])),
+                    by = expand(rules$by[i])))
           else
-            xtemp<-do.call(`[`,list(x,i=parse(text=rules$domain[i]),
-              j=quote(setNames(c(list(),do.call(functions[[rules$fun[i]]],unname(mget(expand(rules$input[i]))))),vars[is.na(values)])),
-              by=expand(rules$by[i])))
+            xtemp <- do.call(`[`,list(x,i = parse(text = rules$domain[i]),
+              j = quote(setNames(c(list(),do.call(functions[[rules$fun[i]]],unname(mget(expand(rules$input[i]))))),vars[is.na(values)])),
+              by = expand(rules$by[i])))
 
-          xtemp[,vars[!is.na(values)]:=as.list(values[!is.na(values)])]
+          xtemp[,vars[!is.na(values)] := as.list(values[!is.na(values)])]
 
           # Se insertan las filas nuevas
 
-          x<-rbindlist(list(x,xtemp),use.names=TRUE,fill=TRUE)
+          x <- rbindlist(list(x,xtemp),use.names = TRUE,fill = TRUE)
 
           next
         }
@@ -147,11 +147,11 @@ setMethod(
   signature = c("StQ", "StQT"),
   function(x, Tr){
 
-    rules<-getRules(Tr)
-    functions<-getFunctions(Tr)
+    rules <- getRules(Tr)
+    functions <- getFunctions(Tr)
 
     # Se aplican por orden todas las reglas
-    for(i in 1:nrow(rules))
+    for (i in 1:nrow(rules))
     {
 
 

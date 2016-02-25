@@ -28,10 +28,10 @@ setMethod(
   signature = c("StQT"),
   function(x, i, ..., drop = TRUE){
 
-    rules<-getRules(x)
-    funcs<-getFunctions(x)
-    rules<-rules[(1:nrow(rules))[i],]
-    output<-new(Class = 'StQT', Rules = rules, Functions = funcs[RemoveInternal(rules$fun)])
+    rules <- getRules(x)
+    funcs <- getFunctions(x)
+    rules <- rules[(1:nrow(rules))[i],]
+    output <- new(Class = 'StQT', Rules = rules, Functions = funcs[RemoveInternal(rules$fun)])
     return(output)
 
   }

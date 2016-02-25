@@ -1,10 +1,10 @@
 Package: StQT
 Type: Package
 Title: Transformation of Standard Questionnaires
-Version: 0.1
+Version: 0.1.0.9000
 Date: 2015-12-15
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
+Author: Luis Sanguiao
+Maintainer: Luis Sanguiao <luis.sanguiao.sande@gmail.com>
 Description: More about what it does (maybe more than one line)
 License: What license is it under?
 LazyData: TRUE
