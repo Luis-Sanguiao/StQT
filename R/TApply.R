@@ -121,7 +121,7 @@ setMethod(
               j = quote(setNames(c(list(),do.call(functions[[rules$fun[i]]],unname(mget(expand(rules$input[i]))))),vars[is.na(values)])),
               by = expand(rules$by[i])))
 
-          xtemp[,vars[!is.na(values)] := as.list(values[!is.na(values)])]
+          xtemp[,vars[!is.na(values)] := values[!is.na(values)]]
 
           # Se insertan las filas nuevas
 
@@ -147,14 +147,75 @@ setMethod(
   signature = c("StQ", "StQT"),
   function(x, Tr){
 
+    # Extract slots from objects
     rules <- getRules(Tr)
     functions <- getFunctions(Tr)
+    DD <- getDD(x)
+    DATA <- getData(x)
 
-    # Se aplican por orden todas las reglas
-    for (i in 1:nrow(rules))
-    {
+    vars <- getVars(rules,DD)
+    DTList <- getDataTableList(x,vars)
+    DATA <- DATA[!(IDDD %in% unlist(vars)),]
 
+    for (i in 1:nrow(rules)) {
 
+        # Extract variables
+      vars <- getVars(rules[i,],DD)
+      vars <- setOrderVars(vars,DTList,DD)
+      if (is.null(vars)) stop("[StQT::TApply] There is no obvious way to link variables at rule ",i)
+
+        # Set data.table
+      DT <- mergeDataTable(DTList,vars,DD)
+      if (rules$domain[i] != "") DT <- DT[eval(parse(text = rules$domain[i])),]
+
+        # Apply rule in data.table
+      rows <- nrow(DT)
+      DT <- TApply(DT,Tr[i])
+      if (nrow(DT) > rows) DT <- DT[-1:-rows,]
+
+        # Store new variables / Update DD
+
+      if (rules$ref[i] == "") {
+         # Default qualifiers are those from main variable
+        microdata <- getData(DD)
+        ref <- unname(unlist(microdata[Variable == vars[1], getQuals(microdata),with = FALSE]))
+        ref <- ref[ref != ""]
+      }
+      else ref <- expand(rules$ref[i])
+
+      DT <- DT[,c(ref, setdiff(ssplit(rules$output[i]),ref)),with = FALSE]
+      setkeyv(DT,ref)
+      DT <- unique(DT)
+
+      vlogic <- unlist(lapply(DTList,function(x) setequal(key(x),ref)))
+      if (any(vlogic)) {
+        DTList[[which.max(vlogic)]] <- merge(DTList[[which.max(vlogic)]],DT,all = TRUE, suffixes = c("",".NEW"))
+        newcols <- colnames(DTList[[which.max(vlogic)]])[grepl(".NEW",colnames(DTList[[which.max(vlogic)]]))]
+        if (length(newcols)) {
+          oldcols <- substr(newcols,1,nchar(newcols) - 4)
+          DTList[[which.max(vlogic)]][, c(oldcols,newcols) :=
+            c(mapply(combine,mget(oldcols),mget(newcols),SIMPLIFY = FALSE),rep(list(NULL),length(newcols))),with = FALSE]
+        }
+      }
+      else {
+        DTList <- c(DTList,list(DT))
+      }
+      DD <- DDadd(ssplit(rules$output[i]),DD,DT)
     }
+
+    # merge new data in x
+
+    setkeyv(DATA,setdiff(colnames(DATA),c("IDDD","Value")))
+    DTList <- c(list(DATA),DTList)
+    quals <- unique(unname(unlist(lapply(DTList,key))))
+    DTList <- lapply(DTList,function(x) {
+      x[,setdiff(quals,colnames(x)) := "", with = FALSE]
+      return(x)
+    })
+    DTList <- c(DTList[1],lapply(DTList[-1],melt,id.vars = quals, variable.name = "IDDD", value.name = "Value"))
+    DATA <- rbindlist(DTList,fill = TRUE)
+    DATA[is.na(Value),Value := ""]
+    return(new(Class = "StQ", Data = DATA, DD = DD))
+
   }
 )

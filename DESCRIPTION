@@ -11,9 +11,9 @@ LazyData: TRUE
 RoxygenNote: 5.0.1
 Collate:
     'StQT-class.R'
+    'Utils.R'
     'NewStQT.R'
     'getRules.R'
-    'Utils.R'
     'getFunctions.R'
     'TApply.R'
     'subset.StQT.R'

@@ -23,7 +23,7 @@ setClass(Class = "StQT",
          slots = c(Rules = 'data.frame', Functions = 'list'),
          validity = function(object){
 
-           if (!setequal((names(object@Rules)),c("domain","output","fun","input","by","key")))
+           if (!setequal((names(object@Rules)),c("domain","output","fun","input","by","key","ref")))
              stop('[Validity StQT] Conjunto de reglas incorrecto.')
 
            if (!all(unlist(lapply(object@Rules,is.character))))

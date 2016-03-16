@@ -5,7 +5,7 @@
 \alias{[,StQT-method}
 \title{Extrae partes de un objeto de clase StQT.}
 \usage{
-\S4method{[}{StQT}(x, i, j, ..., drop = TRUE)
+\S4method{[}{StQT}(x, i, j, ..., drop = FALSE)
 }
 \arguments{
 \item{x}{objeto de clase \linkS4class{StQT} del que se van a extraer los

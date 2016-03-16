@@ -25,9 +25,10 @@
 #' @export
 setMethod(
   f = "[",
-  signature = c("StQT"),
-  function(x, i, ..., drop = TRUE){
+  signature = c(x = "StQT"),
+  function(x, i, j, ..., drop=FALSE){
 
+    if (nargs() > 2) stop("[StQT::subset.StQT] Subsetting only admits one argument.")
     rules <- getRules(x)
     funcs <- getFunctions(x)
     rules <- rules[(1:nrow(rules))[i],]

@@ -16,7 +16,7 @@ setGeneric("NewStQT", function(x){standardGeneric("NewStQT")})
 
 #' @rdname NewStQT
 #'
-#' @include StQT-class.R,Utils.R
+#' @include StQT-class.R Utils.R
 #'
 #'
 #' @export
