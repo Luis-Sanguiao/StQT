@@ -15,9 +15,14 @@ expand <- function(string)
 ssplit <- function(string,left=TRUE)
 {
   expr <- parse(text = paste0("list(",string,")"))[[1]]
+  output <- names(expr)[-1]
+  if (all(output != "") & (length(all.vars(expr)) == length(output))) {
+    if (left) return(output)
+    else return(all.vars(expr))
+  }
   if (left)
   {
-    output <- names(expr)[-1]
+
     noequal <- all.vars(expr)
     if (!is.null(output))
       output[output == ""] <- noequal
