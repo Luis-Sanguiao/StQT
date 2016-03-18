@@ -155,3 +155,9 @@ combine <- function(x,y) {
     x[!is.na(y)] <- y[!is.na(y)]
   return(x)
 }
+
+# sidelink extracts left/right sides of a link a==b & c==d ...
+sidelink <- function(x,left) {
+  if (identical(x[[1]],quote(`&`))) return(c(sidelink(x[[2]],left),sidelink(x[[3]],left)))
+  if (identical(x[[1]],quote(`==`))) if (left) return(as.character(x[[2]])) else return(as.character(x[[3]]))
+}
