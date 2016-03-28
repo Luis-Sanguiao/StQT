@@ -176,7 +176,7 @@ setMethod(
       if (rules$ref[i] == "") {
          # Default qualifiers are those from main variable
         microdata <- getData(DD)
-        ref <- unname(unlist(microdata[Variable == vars[1], getQuals(microdata),with = FALSE]))
+        ref <- unname(unlist(microdata[Variable == vars[[1]][1], getQuals(microdata),with = FALSE]))
         ref <- ref[ref != ""]
       }
       else ref <- expand(rules$ref[i])
