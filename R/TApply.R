@@ -96,13 +96,13 @@ setMethod(
 
         if (!grepl("=",rules$output[i]))
         {
-          if (rules$domain[i] == "")
-            do.call(`[`,list(x,j = quote(expand(rules$output[i]) := do.call(functions[[rules$fun[i]]],unname(mget(expand(rules$input[i]))))),
-              by = expand(rules$by[i])))
-          else
-          do.call(`[`,list(x,i = parse(text = rules$domain[i]),
-              j = quote(expand(rules$output[i]) := do.call(functions[[rules$fun[i]]],unname(mget(expand(rules$input[i]))))),
-              by = expand(rules$by[i])))
+          f <- functions[[rules$fun[i]]]
+          outnames <- expand(rules$output[i])
+
+          command <- paste0("x[",rules$domain[i],",outnames:=f(",rules$input[i],")")
+          if (rules$by[i] != "") command <- paste0(command,",by = .(",rules$by[i],"),with=FALSE]")
+          else command <- paste0(command,",with=FALSE]")
+          eval(parse(text = command))
           next
         }
 
@@ -112,16 +112,13 @@ setMethod(
           # Primero calculamos las filas a insertar
           vars <- ssplit(rules$output[i],TRUE)
           values <- ssplit(rules$output[i],FALSE)
+          f <- functions[[rules$fun[i]]]
 
-          if (rules$domain[i] == "")
-            xtemp <- do.call(`[`,list(x,
-                    j = quote(setNames(c(list(),do.call(functions[[rules$fun[i]]],unname(mget(expand(rules$input[i]))))),vars[is.na(values)])),
-                    by = expand(rules$by[i])))
-          else
-            xtemp <- do.call(`[`,list(x,i = parse(text = rules$domain[i]),
-              j = quote(setNames(c(list(),do.call(functions[[rules$fun[i]]],unname(mget(expand(rules$input[i]))))),vars[is.na(values)])),
-              by = expand(rules$by[i])))
-
+          command <- paste0("xtemp <- x[",rules$domain[i],",f(",rules$input[i],")")
+          if (rules$by[i] != "") command <- paste0(command,",by = .(",rules$by[i],")]")
+          else command <- paste0(command,"]")
+          eval(parse(text = command))
+          setnames(xtemp,(ncol(xtemp) - sum(is.na(values)) + 1):ncol(xtemp),vars[is.na(values)])
           xtemp[,vars[!is.na(values)] := values[!is.na(values)]]
 
           # Se insertan las filas nuevas

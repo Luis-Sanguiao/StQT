@@ -33,7 +33,7 @@ funciones internas, inserción de filas e inserción de columnas.
 \item{Funciones internas}{FunDelRow, FunDelCol y FunAutoLink. La primera borra
 las filas que cumplen la condición especificada en domain. La segunda borra las columnas
 especificadas en output. La tercera extrae datos de la propia tabla, enlazando según las
-igualdades de input, copiando según las igualdades especificadas en output}
+igualdades de domain, copiando el input en el output}
 \item{Inserción de filas}{Se insertan filas. Los output que contienen una igualdad se asignan directamente
 y el resto se calculan según el esquema output=fun(input)}
 \item{Inserción de columnas}{Se insertan columnas calculadas según el esquema output = fun (input)}
