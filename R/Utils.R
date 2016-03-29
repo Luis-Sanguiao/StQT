@@ -16,23 +16,20 @@ ssplit <- function(string,left=TRUE)
 {
   expr <- parse(text = paste0("list(",string,")"))[[1]]
   output <- names(expr)[-1]
-  if (all(output != "") & (length(all.vars(expr)) == length(output))) {
-    if (left) return(output)
-    else return(all.vars(expr))
-  }
+
   if (left)
   {
-
     noequal <- all.vars(expr)
     if (!is.null(output))
       output[output == ""] <- noequal
     else output <- noequal
-    return(output)
   }
   else
   {
     output <- unname(lapply(expr,function(x) if (is.atomic(x)) x else NA))[-1]
   }
+
+  return(output)
 }
 
 # getQuals returns colnames Qual* from a data.table
@@ -51,14 +48,19 @@ getFormula <- function(quals)
 # getVars returns a list with the vars in a transformation grouped by qualifiers
 getVars <- function(rules,DD)
 {
-  microdata <- getData(DD)
+  DDdata <- getDDdata(DD)
+
   varset <- unique(unlist(lapply(as.list(unname(unlist(rules))),ssplit,left = TRUE)))
-  varset <- intersect(varset,unlist(microdata[Sort == "IDDD",Variable]))
+  linkvars <- unlist(DDdata[Variable %in% varset & Sort == "IDDD", getQuals(DDdata), with = FALSE])
+  if (DDdata[Sort == "IDQual",Variable][1] %in% linkvars)
+    varset <- union(varset,linkvars)
+  varset <- intersect(varset,unlist(DDdata[Sort == "IDDD",Variable]))
+
   output <- list(varset[1])
   for (variable in varset[-1]) {
     vlogic <- unlist(lapply(lapply(output,`[`,i = 1),
-                function(x) setequal(unlist(microdata[Variable == x,getQuals(microdata), with = FALSE]),
-                  unlist(microdata[Variable == variable,getQuals(microdata), with = FALSE]))))
+                function(x) setequal(unlist(DDdata[Variable == x & Sort == "IDDD",getQuals(DDdata), with = FALSE]),
+                  unlist(DDdata[Variable == variable & Sort == "IDDD",getQuals(DDdata), with = FALSE]))))
     if (!any(vlogic)) output <- c(output,variable)
     else output[[which.max(vlogic)]] <- c(output[[which.max(vlogic)]],variable)
   }
@@ -69,19 +71,25 @@ getVars <- function(rules,DD)
 # setOrderVars puts main variable in first place
 setOrderVars <- function(vars,DTList,DD)
 {
-  microdata <- getData(DD)
+  DDdata <- getDDdata(DD)
 
   DTListQuals <- lapply(DTList,key)
   varsQuals <- lapply(lapply(vars,`[`,i = 1), function(x) {
-    output <- unlist(microdata[Variable == x, getQuals(microdata),with = FALSE])
+    output <- unlist(DDdata[Variable == x & Sort == "IDDD", getQuals(DDdata),with = FALSE])
     output <- output[output != ""]
     return(output)
   })
-  allQuals <- unique(unname(unlist(varsQuals)))
+  AggIDQuals <- unlist(DDdata[Sort == "IDQual",Variable])[-1]
+  allQuals <- setdiff(unique(unname(unlist(varsQuals))),AggIDQuals)
+  if (length(allQuals) == 0) allQuals <- unique(unname(unlist(varsQuals)))
   vlogic <- unlist(lapply(varsQuals,function(x) setequal(intersect(x,allQuals),allQuals)))
   if (any(vlogic))
-    return(c(vars[which.max(vlogic)],vars[-which.max(vlogic)]))
+    output <- c(vars[which.max(vlogic)],vars[-which.max(vlogic)])
   else return(NULL)
+
+  vlogic <- unlist(lapply(output[-1], function(x) return(length(intersect(x,AggIDQuals)) != 0)))
+  if (length(vlogic) == 0) return(output)
+  else return(c(output[1],output[-1][vlogic],output[-1][!vlogic]))
 }
 
 
@@ -92,15 +100,15 @@ getDataTableList <-  function(object, vars)
 
   # Get Slots from objects
   DD <- getDD(object)
-  microdata <- getData(DD)
   Data <- getData(object)
+  DDdata <- getDDdata(DD)
 
   output <- lapply(vars,function(newvars) {
-    quals <- unlist(microdata[Variable == newvars[1],getQuals(microdata), with = FALSE])
+    quals <- unlist(DDdata[Variable == newvars[1] & Sort == "IDDD",getQuals(DDdata), with = FALSE])
     quals <- quals[quals != ""]
     subtable <- dcast(Data, getFormula(quals), subset = .(IDDD %in% newvars), value.var = "Value")
     subtable[,colnames(subtable) :=
-        lapply(as.list(colnames(subtable)), function(x) as(get(x),unlist(microdata[Variable == x,"Class",with = FALSE]))),
+        lapply(as.list(colnames(subtable)), function(x) as(get(x),unlist(DDdata[Variable == x,"Class",with = FALSE])[1])),
         with = FALSE]
     setkeyv(subtable,unname(quals))
     return(subtable)
@@ -110,27 +118,27 @@ getDataTableList <-  function(object, vars)
 }
 
 # mergeDataTable creates the data.table where we will apply the rule from DTList and vars
-mergeDataTable <- function(DTList,vars,DD) {
+mergeDataTable <- function(DTList,vars) {
 
-  #get Slots from objects
-  microdata <- getData(DD)
 
   newdata <- lapply(vars,function(x) {
-    vlogic <- unlist(lapply(DTList, function(y) x[1] %in% colnames(y)))
+    vlogic <- unlist(lapply(DTList, function(y) x[1] %in% setdiff(colnames(y),key(y))))
     output <- DTList[[which.max(vlogic)]][,c(key(DTList[[which.max(vlogic)]]),x),with = FALSE]
     return(output)
   })
 
-  Reduce(merge,newdata)
-
+  output <- newdata[[1]]
+  for (y in newdata[-1]) output <- merge(output,y,by = key(y))
+  return(output)
 }
 
+# DDadd adds new variables to DD file
 DDadd <- function(variables,DD,DT) {
 
   #get Slots from objects
-  microdata <- getData(DD)
+  DDdata <- getDDdata(DD)
 
-  variables <- setdiff(variables,microdata$Variable)
+  variables <- setdiff(variables,DDdata$Variable)
   if (length(variables) == 0) return(DD)
 
   incDD <- do.call(data.table,c(list(variables, ifelse(variables %in% key(DT),"NonIDQual","IDDD"),
@@ -140,13 +148,23 @@ DDadd <- function(variables,DD,DT) {
                 rep(1:length(key(DT)),length(variables))))))
   colnames(incDD) <- c("Variable","Sort","Class",paste0("Qual",1:(ncol(incDD) - 3)))
 
-  microdata <- rbindlist(list(microdata,incDD),fill = TRUE)
-  microdata <- as.data.table(lapply(microdata,function(x) {
+  DDdata <- as.data.table(lapply(DDdata,function(x) {
     x[is.na(x)] <- ""
     return(x)
   }))
 
-  return(new(Class = "DD", VarNameCorresp = getVNC(DD), MicroData = microdata, Aggregates = getAggr(DD)))
+  if (DDdata[Sort == "IDQual",Variable][1] %in% key(DT)) {
+    DDdata <- rbindlist(list(getData(DD),incDD),fill = TRUE)
+    return(new(Class = "DD", VarNameCorresp = getVNC(DD), MicroData = DDdata, Aggregates = getAggr(DD)))
+  }
+  else {
+    incDD$Sort[incDD$Sort == "NonIDQual"] <- "IDQual"
+    Aggregates <- rbindlist(list(getAggr(DD),incDD),fill = TRUE)
+    return(new(Class = "DD", VarNameCorresp = getVNC(DD), MicroData = getData(DD), Aggregates = Aggregates))
+  }
+
+
+
 }
 
 
@@ -160,4 +178,15 @@ combine <- function(x,y) {
 sidelink <- function(x,left) {
   if (identical(x[[1]],quote(`&`))) return(c(sidelink(x[[2]],left),sidelink(x[[3]],left)))
   if (identical(x[[1]],quote(`==`))) if (left) return(as.character(x[[2]])) else return(as.character(x[[3]]))
+}
+
+# getDDdata returns a data.table with information from DD slot
+
+getDDdata <- function(DD) {
+  DDdata <- rbindlist(list(getData(DD),getAggr(DD)),fill = TRUE, use.names = TRUE)
+  DDdata <- as.data.table(lapply(DDdata,function(x) {
+    x[is.na(x)] <- ""
+    return(x)
+  }))
+  return(DDdata)
 }

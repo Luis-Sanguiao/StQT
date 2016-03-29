@@ -1,12 +1,12 @@
-#' Aplica una transformación a una tabla de datos.
+#' Applies a transformation object on a StQ or data.table.
 #'
-#' \code{TApply} devuelve una tabla de datos transformada.
+#' \code{TApply} returns a transformed object according to the transformation rules.
 #'
-#' Existen tres tipos de reglas de transformación básicas:
-#' funciones internas, inserción de filas e inserción de columnas.
+#' There are three kinds of transformation rules:
+#' internal functions, row insertion and column insertion.
 #' \describe{
-#' \item{Funciones internas}{FunDelRow, FunDelCol y FunAutoLink. La primera borra
-#' las filas que cumplen la condición especificada en domain. La segunda borra las columnas
+#' \item{Internal functions}{FunDelRow, FunDelCol and FunAutoLink so far. The first one deletes
+#' rows in domain. La segunda borra las columnas
 #' especificadas en output. La tercera extrae datos de la propia tabla, enlazando según las
 #' igualdades de domain, copiando el input en el output}
 #' \item{Inserción de filas}{Se insertan filas. Los output que contienen una igualdad se asignan directamente
@@ -153,6 +153,7 @@ setMethod(
 
     vars <- getVars(rules,DD)
     DTList <- getDataTableList(x,vars)
+
     DATA <- DATA[!(IDDD %in% unlist(vars)),]
 
     for (i in 1:nrow(rules)) {
@@ -160,10 +161,12 @@ setMethod(
         # Extract variables
       vars <- getVars(rules[i,],DD)
       vars <- setOrderVars(vars,DTList,DD)
+
       if (is.null(vars)) stop("[StQT::TApply] There is no obvious way to link variables at rule ",i)
 
         # Set data.table
-      DT <- mergeDataTable(DTList,vars,DD)
+      DT <- mergeDataTable(DTList,vars)
+
       if (rules$domain[i] != "") DT <- DT[eval(parse(text = rules$domain[i])),]
 
         # Apply rule in data.table
@@ -175,8 +178,8 @@ setMethod(
 
       if (rules$ref[i] == "") {
          # Default qualifiers are those from main variable
-        microdata <- getData(DD)
-        ref <- unname(unlist(microdata[Variable == vars[[1]][1], getQuals(microdata),with = FALSE]))
+        DDdata <- getDDdata(DD)
+        ref <- unname(unlist(DDdata[Variable == vars[[1]][1] & Sort == "IDDD", getQuals(DDdata),with = FALSE]))
         ref <- ref[ref != ""]
       }
       else ref <- expand(rules$ref[i])
@@ -203,16 +206,15 @@ setMethod(
 
     # merge new data in x
 
-    setkeyv(DATA,setdiff(colnames(DATA),c("IDDD","Value")))
     DTList <- c(list(DATA),DTList)
-    quals <- unique(unname(unlist(lapply(DTList,key))))
-    DTList <- lapply(DTList,function(x) {
-      x[,setdiff(quals,colnames(x)) := "", with = FALSE]
-      return(x)
-    })
-    DTList <- c(DTList[1],lapply(DTList[-1],melt,id.vars = quals, variable.name = "IDDD", value.name = "Value"))
+
+    DTList <- c(DTList[1],lapply(DTList[-1],function(x)
+      melt(data = x,id.vars = key(x), variable.name = "IDDD", value.name = "Value", variable.factor = FALSE)))
     DATA <- rbindlist(DTList,fill = TRUE)
-    DATA[is.na(Value),Value := ""]
+    DATA <- as.data.table(lapply(DATA, function(x) {
+      x[is.na(x)] <- ""
+      return(x)
+    }))
     return(new(Class = "StQ", Data = DATA, DD = DD))
 
   }

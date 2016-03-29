@@ -5,7 +5,7 @@
 \alias{TApply}
 \alias{TApply,StQ,StQT-method}
 \alias{TApply,data.table,StQT-method}
-\title{Aplica una transformación a una tabla de datos.}
+\title{Applies a transformation object on a StQ or data.table.}
 \usage{
 TApply(x, Tr)
 
@@ -24,14 +24,14 @@ a aplicar.}
 \linkS4class{StQ} o \linkS4class{data.table} con los datos transformados
 }
 \description{
-\code{TApply} devuelve una tabla de datos transformada.
+\code{TApply} returns a transformed object according to the transformation rules.
 }
 \details{
-Existen tres tipos de reglas de transformación básicas:
-funciones internas, inserción de filas e inserción de columnas.
+There are three kinds of transformation rules:
+internal functions, row insertion and column insertion.
 \describe{
-\item{Funciones internas}{FunDelRow, FunDelCol y FunAutoLink. La primera borra
-las filas que cumplen la condición especificada en domain. La segunda borra las columnas
+\item{Internal functions}{FunDelRow, FunDelCol and FunAutoLink so far. The first one deletes
+rows in domain. La segunda borra las columnas
 especificadas en output. La tercera extrae datos de la propia tabla, enlazando según las
 igualdades de domain, copiando el input en el output}
 \item{Inserción de filas}{Se insertan filas. Los output que contienen una igualdad se asignan directamente
