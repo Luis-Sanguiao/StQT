@@ -136,34 +136,44 @@ mergeDataTable <- function(DTList,vars) {
 DDadd <- function(variables,DD,DT) {
 
   #get Slots from objects
-  DDdata <- getDDdata(DD)
+  microdata <- getData(DD)
+  if (microdata[Sort == "IDQual",Variable] %in% key(DT)) DDdata <- microdata
+  else DDdata <- getAggr(DD)
 
+  variables <- union(variables,key(DT))
   variables <- setdiff(variables,DDdata$Variable)
   if (length(variables) == 0) return(DD)
 
-  incDD <- do.call(data.table,c(list(variables, ifelse(variables %in% key(DT),"NonIDQual","IDDD"),
+  incDD <- do.call(data.table,c(list(variables, ifelse(variables %in% key(DT),"Qual","IDDD"),
                 unname(unlist(lapply(DT[,variables,with = FALSE],class)))),
                 unname(split(unlist(lapply(variables %in% key(DT),
                   function(x) if (x) return(rep("",length(key(DT)))) else return(key(DT)))),
                 rep(1:length(key(DT)),length(variables))))))
   colnames(incDD) <- c("Variable","Sort","Class",paste0("Qual",1:(ncol(incDD) - 3)))
 
+  if (microdata[Sort == "IDQual",Variable] %in% key(DT)) {
+    incDD[Sort == "Qual",Sort := "NonIDQual"]
+    DDdata <- rbindlist(list(DDdata,incDD),fill = TRUE)
+    microdata <- DDdata
+    DDdata <- getAggr(DD)
+  }
+  else {
+    incDD[Sort == "Qual" & (Variable %in% microdata[Sort == "IDDD",Variable]),Sort := "IDQual"]
+    incDD[Sort == "Qual" & !(Variable %in% microdata[Sort == "IDDD",Variable]),Sort := "NonIDQual"]
+    DDdata <- rbindlist(list(DDdata,incDD),fill = TRUE)
+  }
+
   DDdata <- as.data.table(lapply(DDdata,function(x) {
     x[is.na(x)] <- ""
     return(x)
   }))
 
-  if (DDdata[Sort == "IDQual",Variable][1] %in% key(DT)) {
-    DDdata <- rbindlist(list(getData(DD),incDD),fill = TRUE)
-    return(new(Class = "DD", VarNameCorresp = getVNC(DD), MicroData = DDdata, Aggregates = getAggr(DD)))
-  }
-  else {
-    incDD$Sort[incDD$Sort == "NonIDQual"] <- "IDQual"
-    Aggregates <- rbindlist(list(getAggr(DD),incDD),fill = TRUE)
-    return(new(Class = "DD", VarNameCorresp = getVNC(DD), MicroData = getData(DD), Aggregates = Aggregates))
-  }
+  microdata <- as.data.table(lapply(microdata,function(x) {
+    x[is.na(x)] <- ""
+    return(x)
+  }))
 
-
+  return(new(Class = "DD", VarNameCorresp = getVNC(DD), MicroData = microdata, Aggregates = DDdata))
 
 }
 

@@ -6,8 +6,8 @@
 #' internal functions, row insertion and column insertion.
 #' \describe{
 #' \item{Internal functions}{FunDelRow, FunDelCol and FunAutoLink so far. The first one deletes
-#' rows in domain. La segunda borra las columnas
-#' especificadas en output. La tercera extrae datos de la propia tabla, enlazando según las
+#' rows in domain. The second one deletes columns in output.
+#' La tercera extrae datos de la propia tabla, enlazando según las
 #' igualdades de domain, copiando el input en el output}
 #' \item{Inserción de filas}{Se insertan filas. Los output que contienen una igualdad se asignan directamente
 #' y el resto se calculan según el esquema output=fun(input)}
@@ -215,6 +215,7 @@ setMethod(
       x[is.na(x)] <- ""
       return(x)
     }))
+    setcolorder(DATA,c(setdiff(colnames(DATA),c("IDDD","Value")),"IDDD","Value"))
     return(new(Class = "StQ", Data = DATA, DD = DD))
 
   }
