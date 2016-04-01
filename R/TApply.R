@@ -16,7 +16,7 @@
 #' El parámetro domain restringe los registros en los que se realiza el cálculo.
 #' El parámetro by aplica la transformación por subtablas según los valores de las variables
 #' contenidas en dicho parámetro.
-#' El parámetro key aplica una ordenación de la tabla (útil para incrementar la velocidad),
+#' El parámetro order aplica una ordenación de la tabla (útil para incrementar la velocidad),
 #' que se realiza previamente a la transformación correspondiente.
 #'
 #'
@@ -52,9 +52,9 @@ setMethod(
       for (i in 1:nrow(rules))
       {
         # Se ordenan los datos
-        if (rules$key[i] != "")
+        if (rules$order[i] != "")
         {
-          setkeyv(x,expand(rules$key[i]))
+          setkeyv(x,expand(rules$order[i]))
         }
 
         # Se comprueban las funciones especiales:
@@ -176,13 +176,13 @@ setMethod(
 
         # Store new variables / Update DD
 
-      if (rules$ref[i] == "") {
+      if (rules$key[i] == "") {
          # Default qualifiers are those from main variable
         DDdata <- getDDdata(DD)
         ref <- unname(unlist(DDdata[Variable == vars[[1]][1] & Sort == "IDDD", getQuals(DDdata),with = FALSE]))
         ref <- ref[ref != ""]
       }
-      else ref <- expand(rules$ref[i])
+      else ref <- expand(rules$key[i])
 
       DT <- DT[,c(ref, setdiff(ssplit(rules$output[i]),ref)),with = FALSE]
       setkeyv(DT,ref)

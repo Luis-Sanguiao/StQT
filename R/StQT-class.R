@@ -10,7 +10,8 @@
 #' \item{fun}{función a aplicar}
 #' \item{input}{variable(s) de entrada}
 #' \item{by}{agrupación}
-#' \item{key}{variable(s) por las que ordenar los datos}
+#' \item{order}{variable(s) por las que ordenar los datos}
+#' \item{key}{key of the output variables}
 #' } y del slot \code{Functions} que es una lista con todas las funciones utilizadas en dichas reglas.
 #'
 #' @examples
@@ -23,7 +24,7 @@ setClass(Class = "StQT",
          slots = c(Rules = 'data.frame', Functions = 'list'),
          validity = function(object){
 
-           if (!setequal((names(object@Rules)),c("domain","output","fun","input","by","key","ref")))
+           if (!setequal((names(object@Rules)),c("domain","output","fun","input","by","key","order")))
              stop('[Validity StQT] Conjunto de reglas incorrecto.')
 
            if (!all(unlist(lapply(object@Rules,is.character))))

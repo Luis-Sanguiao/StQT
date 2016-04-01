@@ -31,8 +31,8 @@ There are three kinds of transformation rules:
 internal functions, row insertion and column insertion.
 \describe{
 \item{Internal functions}{FunDelRow, FunDelCol and FunAutoLink so far. The first one deletes
-rows in domain. La segunda borra las columnas
-especificadas en output. La tercera extrae datos de la propia tabla, enlazando según las
+rows in domain. The second one deletes columns in output.
+La tercera extrae datos de la propia tabla, enlazando según las
 igualdades de domain, copiando el input en el output}
 \item{Inserción de filas}{Se insertan filas. Los output que contienen una igualdad se asignan directamente
 y el resto se calculan según el esquema output=fun(input)}
@@ -41,7 +41,7 @@ y el resto se calculan según el esquema output=fun(input)}
 El parámetro domain restringe los registros en los que se realiza el cálculo.
 El parámetro by aplica la transformación por subtablas según los valores de las variables
 contenidas en dicho parámetro.
-El parámetro key aplica una ordenación de la tabla (útil para incrementar la velocidad),
+El parámetro order aplica una ordenación de la tabla (útil para incrementar la velocidad),
 que se realiza previamente a la transformación correspondiente.
 }
 \examples{

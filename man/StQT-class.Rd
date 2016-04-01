@@ -16,7 +16,8 @@ que es un data.frame que contiene las reglas de transformación según el modelo
 \item{fun}{función a aplicar}
 \item{input}{variable(s) de entrada}
 \item{by}{agrupación}
-\item{key}{variable(s) por las que ordenar los datos}
+\item{order}{variable(s) por las que ordenar los datos}
+\item{key}{key of the output variables}
 } y del slot \code{Functions} que es una lista con todas las funciones utilizadas en dichas reglas.
 }
 \examples{
