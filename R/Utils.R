@@ -52,7 +52,7 @@ getVars <- function(rules,DD)
 
   varset <- unique(unlist(lapply(as.list(unname(unlist(rules))),ssplit,left = TRUE)))
   linkvars <- unlist(DDdata[Variable %in% varset & Sort == "IDDD", getQuals(DDdata), with = FALSE])
-  if (DDdata[Sort == "IDQual",Variable][1] %in% linkvars)
+  if (any(DDdata[Sort == "IDQual",Variable][1] %in% linkvars))
     varset <- union(varset,linkvars)
   varset <- intersect(varset,unlist(DDdata[Sort == "IDDD",Variable]))
 
@@ -79,9 +79,9 @@ setOrderVars <- function(vars,DTList,DD)
     output <- output[output != ""]
     return(output)
   })
-  AggIDQuals <- unlist(DDdata[Sort == "IDQual",Variable])[-1]
+  AggIDQuals <- setdiff(DDdata[Sort == "IDQual",Variable],getData(DD)[Sort == "IDQual",Variable])
   allQuals <- setdiff(unique(unname(unlist(varsQuals))),AggIDQuals)
-  if (length(allQuals) == 0) allQuals <- unique(unname(unlist(varsQuals)))
+  if (length(intersect(allQuals,DDdata[Sort == "IDQual",Variable])) == 0) allQuals <- unique(unname(unlist(varsQuals)))
   vlogic <- unlist(lapply(varsQuals,function(x) setequal(intersect(x,allQuals),allQuals)))
   if (any(vlogic))
     output <- c(vars[which.max(vlogic)],vars[-which.max(vlogic)])
@@ -137,7 +137,7 @@ DDadd <- function(variables,DD,DT) {
 
   #get Slots from objects
   microdata <- getData(DD)
-  if (microdata[Sort == "IDQual",Variable] %in% key(DT)) DDdata <- microdata
+  if (any(microdata[Sort == "IDQual",Variable] %in% key(DT))) DDdata <- microdata
   else DDdata <- getAggr(DD)
 
   variables <- union(variables,key(DT))
@@ -151,7 +151,7 @@ DDadd <- function(variables,DD,DT) {
                 rep(1:length(key(DT)),length(variables))))))
   colnames(incDD) <- c("Variable","Sort","Class",paste0("Qual",1:(ncol(incDD) - 3)))
 
-  if (microdata[Sort == "IDQual",Variable] %in% key(DT)) {
+  if (any(microdata[Sort == "IDQual",Variable] %in% key(DT))) {
     incDD[Sort == "Qual",Sort := "NonIDQual"]
     DDdata <- rbindlist(list(DDdata,incDD),fill = TRUE)
     microdata <- DDdata

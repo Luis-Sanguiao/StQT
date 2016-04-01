@@ -6,10 +6,9 @@
 #' internal functions, row insertion and column insertion.
 #' \describe{
 #' \item{Internal functions}{FunDelRow, FunDelCol and FunAutoLink so far. The first one deletes
-#' rows in domain. The second one deletes columns in output.
-#' La tercera extrae datos de la propia tabla, enlazando según las
-#' igualdades de domain, copiando el input en el output}
-#' \item{Inserción de filas}{Se insertan filas. Los output que contienen una igualdad se asignan directamente
+#' rows in domain. The second one deletes columns in output. The third one copies the input variables from the table
+#' linking according to the expression in domain.}
+#' \item{Row insertion}{Se insertan filas. Los output que contienen una igualdad se asignan directamente
 #' y el resto se calculan según el esquema output=fun(input)}
 #' \item{Inserción de columnas}{Se insertan columnas calculadas según el esquema output = fun (input)}
 #' }
