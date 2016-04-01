@@ -8,9 +8,9 @@
 #' \item{Internal functions}{FunDelRow, FunDelCol and FunAutoLink so far. The first one deletes
 #' rows in domain. The second one deletes columns in output. The third one copies the input variables from the table
 #' linking according to the expression in domain.}
-#' \item{Row insertion}{Se insertan filas. Los output que contienen una igualdad se asignan directamente
-#' y el resto se calculan según el esquema output=fun(input)}
-#' \item{Inserción de columnas}{Se insertan columnas calculadas según el esquema output = fun (input)}
+#' \item{Row insertion}{Row are inserted. This kind of rule is applied when there exists an assignment in the output.
+#' Unassigned variables are calculated according output = fun(input). Any variable included in by is copied in the new rows.}
+#' \item{Column insertion}{Se insertan columnas calculadas según el esquema output = fun (input)}
 #' }
 #' El parámetro domain restringe los registros en los que se realiza el cálculo.
 #' El parámetro by aplica la transformación por subtablas según los valores de las variables
@@ -43,8 +43,10 @@ setMethod(
   signature = c("data.table", "StQT"),
   function(x,Tr){
 
-      # Se extraen las reglas
+      # Get slots from objects
       rules <- getRules(Tr)
+      if (nrow(rules) == 0) return(x)
+
       functions <- getFunctions(Tr)
 
       # Se aplican por orden todas las reglas
@@ -144,8 +146,10 @@ setMethod(
   signature = c("StQ", "StQT"),
   function(x, Tr){
 
-    # Extract slots from objects
+    # Get slots from objects
     rules <- getRules(Tr)
+    if (nrow(rules) == 0) return(x)
+
     functions <- getFunctions(Tr)
     DD <- getDD(x)
     DATA <- getData(x)

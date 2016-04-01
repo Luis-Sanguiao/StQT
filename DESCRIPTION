@@ -16,6 +16,7 @@ Collate:
     'getRules.R'
     'getFunctions.R'
     'TApply.R'
+    'plus.StQT.R'
     'subset.StQT.R'
 Imports:
     data.table
