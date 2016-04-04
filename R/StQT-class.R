@@ -28,7 +28,8 @@ setClass(Class = "StQT",
                                              input  = character(0),
                                              by     = character(0),
                                              order  = character(0),
-                                             key    = character(0)),
+                                             key    = character(0),
+                                             stringsAsFactors = FALSE),
                           Functions = list()),
          validity = function(object){
 

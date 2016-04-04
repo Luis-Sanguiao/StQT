@@ -18,7 +18,7 @@
 #' @examples
 #' x <- 1
 #'
-#' @include StQT-class.R
+#' @include StQT-class.R getRules.R getFunctions.R
 #'
 #' @import data.table
 #'
@@ -34,9 +34,14 @@ setMethod(
 
     comparefun <- unlist(lapply(funs1,function(x) lapply(funs2,function(y) identical(x,y))))
     if (is.null(comparefun)) {
-      if (nrow(rules1) == 0) return(e2)
-      else return(e1)
+      output.rules <- rbindlist(list(rules1,rules2))
+      if (length(funs1) == 0) output.functions <- funs2
+      else output.functions <- funs1
+      output <- new(Class = 'StQT', Rules = output.rules, Functions = output.functions)
+
+      return(output)
     }
+
     comparefun <- matrix(comparefun, ncol = length(funs1))
     selected2 <- funs2[apply(!comparefun,1,all)]
     names2 <- make.unique(c(names(funs1),names(selected2)))[-1:-length(funs1)]
