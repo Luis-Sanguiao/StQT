@@ -16,6 +16,19 @@ setGeneric("NewStQT", function(x){standardGeneric("NewStQT")})
 
 #' @rdname NewStQT
 #'
+#' @include StQT-class.R
+#'
+#'
+#' @export
+setMethod(
+  f = "NewStQT",
+  signature = c("missing"),
+  definition = function(){
+    return(new(Class = 'StQT'))
+  }
+)
+#' @rdname NewStQT
+#'
 #' @include StQT-class.R Utils.R
 #'
 #'

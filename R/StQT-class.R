@@ -22,6 +22,14 @@
 #' @export
 setClass(Class = "StQT",
          slots = c(Rules = 'data.frame', Functions = 'list'),
+         prototype = list(Rules = data.frame(domain = character(0),
+                                             output = character(0),
+                                             fun    = character(0),
+                                             input  = character(0),
+                                             by     = character(0),
+                                             order  = character(0),
+                                             key    = character(0)),
+                          Functions = list()),
          validity = function(object){
 
            if (!setequal((names(object@Rules)),c("domain","output","fun","input","by","key","order")))

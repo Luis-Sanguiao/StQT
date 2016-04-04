@@ -5,9 +5,12 @@
 \alias{NewStQT}
 \alias{NewStQT,character-method}
 \alias{NewStQT,data.frame-method}
+\alias{NewStQT,missing-method}
 \title{Constructor de objetos de clase StQT}
 \usage{
 NewStQT(x)
+
+\S4method{NewStQT}{missing}()
 
 \S4method{NewStQT}{data.frame}(x)
 

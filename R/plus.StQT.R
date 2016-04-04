@@ -12,6 +12,9 @@
 #'
 #' @return Object of class \code{StQT} that binds e2 rules after e1 rules.
 #'
+#' @details Operator \code{+} is non-commutative for \linkS4class{StQT} objects. It is defined to
+#' fulfill the equality: Tapply(Data,e1+e2) == Tapply(Tapply(Data,e1),e2)
+#'
 #' @examples
 #' x <- 1
 #'
@@ -39,7 +42,7 @@ setMethod(
     names2 <- make.unique(c(names(funs1),names(selected2)))[-1:-length(funs1)]
     for (i in 1:length(names2)) rules2$fun[rules2$fun == names(selected2)[i]] <- names2[i]
     names(selected2) <- names2
-    for (i in length(rules2$fun)) {
+    for (i in 1:length(rules2$fun)) {
       vlogic <- comparefun[which.max(names(funs2) == rules2$fun[i]),]
       if (any(vlogic)) rules2$fun[i] <- names(funs1)[which.max(vlogic)]
     }

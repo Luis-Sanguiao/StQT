@@ -22,6 +22,10 @@ single object of the same class.
 This method overloads the operator \code{\link{+}} and builds a new
 \linkS4class{StQT} object joining both input objects.
 }
+\details{
+Operator \code{+} is non-commutative for \linkS4class{StQT} objects. It is defined to
+fulfill the equality: Tapply(Data,e1+e2) == Tapply(Tapply(Data,e1),e2)
+}
 \examples{
 x <- 1
 
