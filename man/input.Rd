@@ -4,7 +4,7 @@
 \name{input}
 \alias{input}
 \alias{input,StQT-method}
-\title{Method \code{input} for the class \linkS4class{StQT}}
+\title{Input variables from a \linkS4class{StQT} object.}
 \usage{
 input(x)
 
@@ -21,5 +21,6 @@ Character vector with the variable names
 }
 \examples{
 x <- 1
+
 }
 

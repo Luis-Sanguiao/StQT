@@ -30,7 +30,7 @@ data
 \details{
 There are three kinds of transformation rules:
 internal functions, row insertion and column insertion.
-\describe{
+\itemize{
 \item{Internal functions}{FunDelRow, FunDelCol and FunAutoLink so far. The first one deletes
 rows in domain. The second one deletes columns in output. The third one copies the input variables from the table
 linking according to the expression in domain.}

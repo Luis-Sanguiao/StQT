@@ -1,6 +1,6 @@
-#' @title Method \code{input} for the class \linkS4class{StQT}
+#' Input variables from a \linkS4class{StQT} object.
 #'
-#' @description \code{input} gets the input variables needed for a StQT object to work.
+#' \code{input} gets the input variables needed for a StQT object to work.
 #'
 #' @param x Object of class \code{StQT}.
 #'
@@ -8,11 +8,15 @@
 #'
 #' @examples
 #' x <- 1
+#'
+#' @include StQT-class.R
+#'
 #' @export
 setGeneric("input", function(x){standardGeneric("input")})
-#'
+
 #' @rdname input
 #' @include StQT-class.R getRules.R Utils.R length.StQT.R subset.StQT.R
+#'
 #'
 #' @export
 setMethod(

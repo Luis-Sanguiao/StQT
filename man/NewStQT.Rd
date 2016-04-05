@@ -24,7 +24,7 @@ Este constructor devuelve un objeto de clase
 \code{\linkS4class{StQT}}
 }
 \examples{
-x
+x <- 1
 
 }
 

@@ -19,6 +19,7 @@ Collate:
     'subset.StQT.R'
     'length.StQT.R'
     'input.R'
+    'output.R'
     'plus.StQT.R'
 Imports:
     data.table

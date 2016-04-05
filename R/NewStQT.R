@@ -7,7 +7,7 @@
 #' @return Objeto de clase \linkS4class{StQT}.
 #'
 #' @examples
-#' x
+#' x <- 1
 #'
 #' @include StQT-class.R
 #'

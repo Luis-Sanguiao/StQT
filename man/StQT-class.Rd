@@ -5,20 +5,24 @@
 \alias{StQT-class}
 \title{S4 class of dataset transformations.}
 \description{
-Defines an S4 class \code{StQT} with dataset transformation objects.
+Definition of an S4 class named \code{StQT} for dataset transformation.
 }
 \details{
-La estructura de la clase S4 \code{StQT} se compone del slot \code{Rules}
-que es un data.frame que contiene las reglas de transformación según el modelo
-\describe{
-\item{domain}{dónde se aplica la regla}
+The structure of the class \code{StQT} comprises 2 attributes:
+\itemize{
+\item The attribute \code{Rules}, which is a \link{data.frame} with the transformation rules.
+\item The attribute \code{Functions}, which is a list of the functions used in the rules.
+}
+The rules are represented with the following fields in the \code{Rules} data.frame.
+\itemize{
+\item{domain}{Specifies where the rule is applied}
 \item{output}{variable(s) de salida}
 \item{fun}{función a aplicar}
 \item{input}{variable(s) de entrada}
 \item{by}{agrupación}
 \item{order}{variable(s) por las que ordenar los datos}
 \item{key}{key of the output variables}
-} y del slot \code{Functions} que es una lista con todas las funciones utilizadas en dichas reglas.
+}
 }
 \examples{
 x <- new(Class = 'StQT', Rules=data.frame(domain=c("y<3",""),output=c("y=4","exponencial"),fun=c("sum","exp"),input=c("v","v"),by=c("x",""),stringsAsFactors=FALSE))
