@@ -14,14 +14,15 @@ TApply(x, Tr)
 \S4method{TApply}{StQ,StQT}(x, Tr)
 }
 \arguments{
-\item{x}{Objeto de clase \linkS4class{StQ} o \linkS4class{data.table} con los
-datos a transformar}
+\item{x}{Object of class \linkS4class{StQ} or \linkS4class{data.table} with data
+to transform}
 
-\item{Tr}{Objeto de clase \linkS4class{StQT} con las reglas de transformación
-a aplicar.}
+\item{Tr}{Object of class \linkS4class{StQT} with the transformation we are going
+to apply.}
 }
 \value{
-\linkS4class{StQ} o \linkS4class{data.table} con los datos transformados
+\linkS4class{StQ} or \linkS4class{data.table} respectively with transformed
+data
 }
 \description{
 \code{TApply} returns a transformed object according to the transformation rules.
@@ -34,10 +35,10 @@ internal functions, row insertion and column insertion.
 rows in domain. The second one deletes columns in output. The third one copies the input variables from the table
 linking according to the expression in domain.}
 \item{Row insertion}{Row are inserted. This kind of rule is applied when there exists an assignment in the output.
-Unassigned variables are calculated according output = fun(input). Any variable included in by is copied in the new rows.}
-\item{Column insertion}{Se insertan columnas calculadas según el esquema output = fun (input)}
+Unassigned variables are calculated according output = fun(input). Any variable included in by is copied into the new rows.}
+\item{Column insertion}{Rows are calculated according output = fun (input)}
 }
-El parámetro domain restringe los registros en los que se realiza el cálculo.
+Parameter domain specifies the subset of the dataset where we are going to do the calculation.
 El parámetro by aplica la transformación por subtablas según los valores de las variables
 contenidas en dicho parámetro.
 El parámetro order aplica una ordenación de la tabla (útil para incrementar la velocidad),

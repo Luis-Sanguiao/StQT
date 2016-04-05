@@ -31,7 +31,9 @@ setMethod(
     if (nargs() > 2) stop("[StQT::subset.StQT] Subsetting only admits one argument.")
     rules <- getRules(x)
     funcs <- getFunctions(x)
-    rules <- rules[(1:nrow(rules))[i],]
+    index <- (1:nrow(rules))[i]
+    if (is.na(sum(index))) stop("[StQT::subset.StQT] Subsetting out of bounds.")
+    rules <- rules[index,]
     output <- new(Class = 'StQT', Rules = rules, Functions = funcs[RemoveInternal(rules$fun)])
     return(output)
 

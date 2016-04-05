@@ -1,6 +1,6 @@
-#' Clase S4 de transformaciones de un conjunto de datos
+#' S4 class of dataset transformations.
 #'
-#' Definición de una clase S4 \code{StQT} de transformaciones de un conjunto de datos
+#' Defines an S4 class \code{StQT} with dataset transformation objects.
 #'
 #' La estructura de la clase S4 \code{StQT} se compone del slot \code{Rules}
 #' que es un data.frame que contiene las reglas de transformación según el modelo

@@ -16,8 +16,9 @@ Collate:
     'getRules.R'
     'getFunctions.R'
     'TApply.R'
-    'length.StQT.R'
-    'plus.StQT.R'
     'subset.StQT.R'
+    'length.StQT.R'
+    'input.R'
+    'plus.StQT.R'
 Imports:
     data.table

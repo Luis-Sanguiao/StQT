@@ -3,9 +3,9 @@
 \docType{class}
 \name{StQT-class}
 \alias{StQT-class}
-\title{Clase S4 de transformaciones de un conjunto de datos}
+\title{S4 class of dataset transformations.}
 \description{
-Definición de una clase S4 \code{StQT} de transformaciones de un conjunto de datos
+Defines an S4 class \code{StQT} with dataset transformation objects.
 }
 \details{
 La estructura de la clase S4 \code{StQT} se compone del slot \code{Rules}

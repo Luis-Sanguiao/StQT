@@ -20,8 +20,6 @@
 #'
 #' @include StQT-class.R getRules.R getFunctions.R
 #'
-#' @import data.table
-#'
 #' @export
 setMethod(
     f = "+",

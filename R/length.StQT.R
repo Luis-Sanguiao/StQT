@@ -13,8 +13,6 @@
 #'
 #' @include StQT-class.R getRules.R
 #'
-#' @import data.table
-#'
 #' @export
 setMethod(
   f = "length",
