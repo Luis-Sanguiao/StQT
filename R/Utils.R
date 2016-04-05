@@ -1,7 +1,7 @@
 # Removes internal functions from a character vector with function names
 RemoveInternal <- function(x)
 {
-  return(setdiff(x,c("FunDelRow","FunDelCol","FunAutoLink")))
+  return(setdiff(x,c("FunDelRow","FunDelVar","FunAutoLink")))
 }
 
 # expand splits comma separated variables from a string into a character vector

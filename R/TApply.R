@@ -5,9 +5,9 @@
 #' There are three kinds of transformation rules:
 #' internal functions, row insertion and column insertion.
 #' \itemize{
-#' \item{Internal functions}{FunDelRow, FunDelCol and FunAutoLink so far. The first one deletes
-#' rows in domain. The second one deletes columns in output. The third one copies the input variables from the table
-#' linking according to the expression in domain.}
+#' \item{Internal functions}{FunDelRow, FunDelVar and FunAutoLink so far. The first one deletes
+#' rows in domain. The second one deletes the variables specified in the output. The third one
+#' copies the input variables from the table linking according to the expression in domain.}
 #' \item{Row insertion}{Row are inserted. This kind of rule is applied when there exists an assignment in the output.
 #' Unassigned variables are calculated according output = fun(input). Any variable included in by is copied into the new rows.}
 #' \item{Column insertion}{Rows are calculated according output = fun (input)}
@@ -68,8 +68,8 @@ setMethod(
           next
         }
 
-        # FunDelCol elimina las columnas especificadas en output
-        if (rules$fun[i] == "FunDelCol")
+        # FunDelVar elimina las columnas especificadas en output
+        if (rules$fun[i] == "FunDelVar")
         {
           x[,expand(rules$output[i]) := NULL]
           next

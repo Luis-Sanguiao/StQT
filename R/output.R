@@ -27,7 +27,7 @@ setMethod(
     if (length(x) == 1) return(out)
     else {
       output_n <- output(x[1:(length(x) - 1)])
-      if (rules$fun[length(x)] != "FunDelCol")
+      if (rules$fun[length(x)] != "FunDelVar")
         return(union(output_n,out))
       else
         return(setdiff(output_n,out))
