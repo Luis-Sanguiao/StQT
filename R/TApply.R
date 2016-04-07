@@ -162,6 +162,51 @@ setMethod(
 
     for (i in 1:nrow(rules)) {
 
+      # FunDelVar
+      if (rules$fun[i] == "FunDelVar") {
+        vars <- expand(rules$output[i])
+        # Remove variables from DD
+        microdata <- getData(DD)
+        aggregates <- getAggr(DD)
+        microdata <- subset(microdata, !(Variable %in% vars))
+        # We have to remove any var with missing qualifiers
+        vlogic <- apply(aggregates[,getQuals(aggregates),with = FALSE],1,
+                        function(x) length(intersect(x,vars)) != 0)
+        vars <- union(vars,unlist(aggregates[vlogic,Variable]))
+        aggregates <- subset(aggregates, !(Variable %in% vars))
+        # We also have to remove unneeded qualifiers
+        quals <- union(unlist(microdata[Sort == "IDDD", getQuals(microdata), with = FALSE]),
+                       unlist(aggregates[Sort == "IDDD", getQuals(aggregates), with = FALSE]))
+        removequals <- setdiff(union(unlist(microdata[Sort != "IDDD", Variable]),
+                          unlist(aggregates[Sort != "IDDD", Variable])),quals)
+        microdata <- subset(microdata, !(Variable %in% removequals) | Sort == "IDDD")
+        aggregates <- subset(aggregates, !(Variable %in% removequals) | Sort == "IDDD")
+        # Finally we discard any empty Qual* column except for the first one
+        if (length(getQuals(microdata)) > 1)
+          vlogic <- apply(microdata[,getQuals(microdata)[-1],with = FALSE],2,function(x) all(x == ""))
+        else
+          vlogic <- FALSE
+        if (any(vlogic)) microdata[,getQuals(microdata)[-1][vlogic] := NULL, with = FALSE]
+        if (length(getQuals(aggregates)) > 1)
+          vlogic <- apply(aggregates[,getQuals(aggregates)[-1],with = FALSE],2,function(x) all(x == ""))
+        else
+          vlogic <- FALSE
+        if (any(vlogic)) aggregates[,getQuals(aggregates)[-1][vlogic] := NULL, with = FALSE]
+        DD <- new(Class = "DD", VarNameCorresp = getVNC(DD), MicroData = microdata, Aggregates = aggregates)
+
+        # Remove variables from DTList
+        correspvars <- lapply(DTList,function(x) intersect(setdiff(colnames(x),key(x)),vars))
+        mapply(function(x,y) {if (length(y)) x[,y := NULL, with = FALSE]
+                              return(NULL)
+                              },DTList,correspvars)
+        # Keep only the data.table's with variables
+        DTList <- DTList[unlist(lapply(DTList,function(x) !setequal(key(x),colnames(x))))]
+        # Remove unneeded qualifiers in the unmodified DATA
+        if (length(intersect(removequals,colnames(DATA))))
+          DATA[intersect(removequals,colnames(DATA)) := NULL,with = FALSE]
+        next
+      }
+
         # Extract variables
       vars <- getVars(rules[i,],DD)
       vars <- setOrderVars(vars,DTList,DD)
