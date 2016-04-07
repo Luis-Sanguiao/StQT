@@ -46,6 +46,7 @@ setMethod(
     for (i in 1:length(names2)) rules2$fun[rules2$fun == names(selected2)[i]] <- names2[i]
     names(selected2) <- names2
     for (i in 1:length(rules2$fun)) {
+      if (!length(RemoveInternal(rules2$fun[i]))) next
       vlogic <- comparefun[which.max(names(funs2) == rules2$fun[i]),]
       if (any(vlogic)) rules2$fun[i] <- names(funs1)[which.max(vlogic)]
     }
