@@ -26,6 +26,10 @@ setMethod(
     if (length(x) == 0) return(character(0))
 
     rules <- getRules(x)
+    if (rules$fun[1] == "FunDelVar") {
+      rules$input[1] <- rules$output[1]
+      rules$output[1] <- ""
+    }
     output <- unique(c(expand(rules$domain[1]),expand(rules$input[1]),
                        expand(rules$by[1]),expand(rules$order[1])))
     if (length(x) == 1) return(output)
