@@ -200,3 +200,13 @@ getDDdata <- function(DD) {
   }))
   return(DDdata)
 }
+
+# fillSpaces fills a character with spaces to achive a specified width
+fillSpaces <- function(x,n) {
+  dif <- n - nchar(x)
+  if (any(dif < 0)) warning("fillSpaces error: n is smaller than the length of one of the strings")
+  x[dif == 1] <- paste0(x[dif == 1]," ")
+  x[dif > 1] <- paste0(" ",x[dif > 1]," ")
+  if (any(dif > 2)) return(fillSpaces(x,n))
+  else return(x)
+}
