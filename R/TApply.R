@@ -35,7 +35,7 @@ setGeneric("TApply", function(x,Tr){standardGeneric("TApply")})
 
 #' @rdname TApply
 #'
-#' @include StQT-class.R getRules.R getFunctions.R Utils.R
+#' @include StQT-class.R getRules.R getFunctions.R Utils.R input.R
 #' @import data.table
 #'
 #' @export
@@ -47,6 +47,9 @@ setMethod(
       # Get slots from objects
       rules <- getRules(Tr)
       if (nrow(rules) == 0) return(x)
+
+      if (!setequal(intersect(input(Tr),colnames(x)),input(Tr)))
+        stop("[StQT::TApply] The transformation input needs some variables that are missing in the data.table")
 
       functions <- getFunctions(Tr)
 
@@ -138,7 +141,6 @@ setMethod(
 
 #' @rdname TApply
 #'
-#' @include StQT-class.R getRules.R
 #' @import StQ
 #'
 #' @export
@@ -151,8 +153,11 @@ setMethod(
     rules <- getRules(Tr)
     if (nrow(rules) == 0) return(x)
 
-    functions <- getFunctions(Tr)
     DD <- getDD(x)
+    if (!setequal(intersect(input(Tr),getDDdata(DD)$Variable),input(Tr)))
+      stop("[StQT::TApply] The transformation input needs some variables that are missing in the StQ")
+    functions <- getFunctions(Tr)
+
     DATA <- getData(x)
 
     vars <- getVars(rules,DD)
