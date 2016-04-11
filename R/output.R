@@ -24,7 +24,9 @@ setMethod(
     rules <- getRules(x)
     out <- ssplit(rules$output[length(x)])
 
-    if (length(x) == 1) return(out)
+    if (length(x) == 1)
+      if (rules$fun[1] != "FunDelVar") return(out)
+      else return(character(0))
     else {
       output_n <- output(x[1:(length(x) - 1)])
       if (rules$fun[length(x)] != "FunDelVar")
