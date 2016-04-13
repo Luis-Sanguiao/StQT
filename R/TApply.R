@@ -160,7 +160,7 @@ setMethod(
 
     DATA <- getData(x)
 
-    vars <- getVars(rules,DD)
+    vars <- getVars(rules[,c("domain","output","input","by","order")],DD)
     DTList <- getDataTableList(x,vars)
 
     DATA <- DATA[!(IDDD %in% unlist(vars)),]
@@ -213,7 +213,7 @@ setMethod(
       }
 
         # Extract variables
-      vars <- getVars(rules[i,],DD)
+      vars <- getVars(rules[i,][,c("domain","output","input","by","order")],DD)
       vars <- setOrderVars(vars,DTList,DD)
 
       if (is.null(vars)) stop("[StQT::TApply] There is no obvious way to link variables at rule ",i)
