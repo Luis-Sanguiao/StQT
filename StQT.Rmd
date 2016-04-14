@@ -45,6 +45,28 @@ There is also an ``<order>`` field which if not empty, orders the data by the va
 
 Note that ``<key>`` field is ignored unless we are transforming an StQ object (see next section).
 
-# How does TApply work on StQ objects
+# How does a transformation work on StQ objects
+We are assuming that the reader is familiarized with StQ objects and its internal representation. First of all, we have to ask
+ourselves what a variable is. When you dcast an StQ object, you get a lot of columns with long ``"_"`` separated names. For
+us, those **are not** variables. For us, a variable is an IDDD-sort element of the data slots from a DD object. Moreover it
+would be useful to think in it as a vector with a component for each qualifiers combination.
+
+But we have to make some concessions to the qualifiers, because they are the "dimensions" of our vector variable. So we have
+to allow them in the rules, but we should avoid them when possible in ``<input>`` and ``<output>`` field, specially ``<input>``.
+In ``<by>`` and ``<domain>`` they are perfectly acceptable. Let's say we have a variable by unit and region, and we want the
+total by unit. Then we only have to sum the variable by unit and that's it. In this example, we have had to use the unit qualifier
+in the ``<by>`` field, and the rule seems quite clear. By the way, we have to specify that the resulting variable has unit as only
+qualifier (and not unit *and* region). This is what ``<key>`` field is intended for. We know that R sum function returns a single
+value, and since we are grouping by unit, the ``<key>`` should be unit. But if we substitute sum by another function, and we only
+have its closure and arguments, it would be very difficult to find an automatic way to decide if it returns a single value. So
+we specify ``<key>`` as unit.
+
+A second question is what do we do with more than one variable. Let's see. If we have two or more variables whose qualifiers are
+exactly the same, we only have to put them as columns and we have a data.table where to apply the rule as usual. It is natural to
+associate values of both variables when they have the same key. When their qualifiers are different, we look for a variable whose
+qualifiers are the union of all the qualifiers of all the variables. We are going to name this variable as main variable, and we
+are going to use it to link them all. If such variable does not exist, that means that there are more than one maximal variables
+(in the sense that its qualifiers are not included in the other qualifiers), and there is not an unique way to link them. In this
+case the rule is considered no valid, and an error is shown. If we need to link this way, we have to use auxiliar variables.
 
 # Other methods
