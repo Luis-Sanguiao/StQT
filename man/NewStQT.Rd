@@ -6,7 +6,7 @@
 \alias{NewStQT,character-method}
 \alias{NewStQT,data.frame-method}
 \alias{NewStQT,missing-method}
-\title{Constructor de objetos de clase StQT}
+\title{StQT class constructor}
 \usage{
 NewStQT(x)
 
@@ -17,14 +17,24 @@ NewStQT(x)
 \S4method{NewStQT}{character}(x)
 }
 \value{
-Objeto de clase \linkS4class{StQT}.
+\linkS4class{StQT} object.
 }
 \description{
-Este constructor devuelve un objeto de clase
-\code{\linkS4class{StQT}}
+This constructor returns an \code{\linkS4class{StQT}} object
+}
+\details{
+You don't need to specify all rules fields, the constructor will
+generate empty fields when necessary.
 }
 \examples{
-x <- 1
+NewStQT()    # Empty transformation (identity)
+NewStQT(data.frame(
+           output="VAR",
+           fun="*",
+           input="SD,SD",
+           stringsAsFactors = FALSE))
+# If we want to read the rules from a semicolon separated csv file:
+# NewStQT("<filename>")
 
 }
 

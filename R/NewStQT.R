@@ -1,13 +1,21 @@
-#' Constructor de objetos de clase StQT
+#' StQT class constructor
 #'
-#' Este constructor devuelve un objeto de clase
-#' \code{\linkS4class{StQT}}
+#' This constructor returns an \code{\linkS4class{StQT}} object
 #'
+#' @return \linkS4class{StQT} object.
 #'
-#' @return Objeto de clase \linkS4class{StQT}.
+#' @details You don't need to specify all rules fields, the constructor will
+#' generate empty fields when necessary.
 #'
 #' @examples
-#' x <- 1
+#' NewStQT()    # Empty transformation (identity)
+#' NewStQT(data.frame(
+#'            output="VAR",
+#'            fun="*",
+#'            input="SD,SD",
+#'            stringsAsFactors = FALSE))
+#' # If we want to read the rules from a semicolon separated csv file:
+#' # NewStQT("<filename>")
 #'
 #' @include StQT-class.R
 #'
@@ -38,12 +46,14 @@ setMethod(
   signature = c("data.frame"),
   definition = function(x){
 
+    miscols <- setdiff(colnames(NewStQT()@Rules),colnames(x))
+    x <- cbind(x,setNames(as.list(rep("",length(miscols))),miscols),stringsAsFactors = FALSE)
     x[is.na(x)] <- ""
 
     if (!all(unlist(lapply(RemoveInternal(x$fun),exists))))
-      stop('[StQT Constructor] Una de las funciones no está definida.')
+      stop('[StQT Constructor] There are one or more undefined functions')
     if (!all(unlist(lapply(mget(RemoveInternal(x$fun),inherits = TRUE),is.function))))
-      stop('[StQT Constructor] Una de las funciones está definida como otro tipo de objeto.')
+      stop('[StQT Constructor] One or more functions are another kind of object than functions.')
 
     funcs <- mget(RemoveInternal(x$fun),inherits = TRUE)
     output <- new(Class = 'StQT', Rules = x, Functions = funcs)
