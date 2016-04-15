@@ -47,7 +47,8 @@ setMethod(
   definition = function(x){
 
     miscols <- setdiff(colnames(NewStQT()@Rules),colnames(x))
-    x <- cbind(x,setNames(as.list(rep("",length(miscols))),miscols),stringsAsFactors = FALSE)
+    if (length(miscols))
+      x <- cbind(x,setNames(as.list(rep("",length(miscols))),miscols),stringsAsFactors = FALSE)
     x[is.na(x)] <- ""
 
     if (!all(unlist(lapply(RemoveInternal(x$fun),exists))))
