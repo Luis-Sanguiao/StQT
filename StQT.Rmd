@@ -32,10 +32,48 @@ There are three types of rules in StQT:
 
 * Horizontal: These are by far the more common rules and they are applied as we had said with a command like
               ``data[<domain>,<output>:=<fun>(<input>),by=<by>]``. This creates new or override ``<output>`` columns
-              with one element per row applying the usual recycling.
+              with one element per row applying the usual recycling. Next, an elementary example.
+```{r, warning=FALSE, message=FALSE}
+require(data.table)
+require(StQT)
+dt <- data.table(Stratum = c("1","2","3"), SD = c(1.54,1.12,1.88))
+dt
+T1 <- NewStQT(data.frame(
+        domain = "",
+        output = "VAR",
+        fun = "*",
+        input = "SD,SD",
+        by = "",
+        order = "",
+        key = "",
+        stringsAsFactors = FALSE))
+TApply(dt,T1)[]
+```
+We had a table with strata identified and its standard deviation. The transformation binds a new column with the variance of
+the correspondent strata. We could have defined a function returning the square of its argument. But we don't need to do that,
+because we can use R primitive function ``*`` calculating VAR as $\mathrm{SD} \times \mathrm{SD}$.
+
 * Vertical: Similar to horizontal rules, but output includes some assignments (one or more). For each ``<by>`` group an
             additional row is created which copies the variables in ``<by>``, sets the assigned variables and calculates the
-            unassigned in a similar way to an horizontal rule.
+            unassigned in a similar way to an horizontal rule. Let's see an easy example.
+```{r, warning=FALSE, message=FALSE}
+require(data.table)
+require(StQT)
+dt <- data.table(Region = c("1","2","3"), GDP = c(1.38,0.94,1.23))
+dt
+T1 <- NewStQT(data.frame(
+        domain = "",
+        output = "Region='Total',GDP",
+        fun = "sum",
+        input = "GDP",
+        by = "",
+        order = "",
+        key = "",
+        stringsAsFactors = FALSE))
+TApply(dt,T1)
+```
+In this case ``<by>`` is empty, so we have only one group (the whole table) and in consequence we only bind one new row.
+
 * Internal: These are not real functions but *special* codes in ``<fun>`` field that trigger concrete behaviors different to usual
             horizontal or vertical rules. They are *FunDelVar*, *FunDelRow* and *FunAutoLink* so far. Except for *FunDelRow*, we
             could write functions to get the same behavior (at least when applied to data.table objects), but they are anyways useful because
@@ -67,6 +105,6 @@ associate values of both variables when they have the same key. When their quali
 qualifiers are the union of all the qualifiers of all the variables. We are going to name this variable as main variable, and we
 are going to use it to link them all. If such variable does not exist, that means that there are more than one maximal variables
 (in the sense that its qualifiers are not included in the other qualifiers), and there is not an unique way to link them. In this
-case the rule is considered no valid, and an error is shown. If we need to link this way, we have to use auxiliar variables.
+case the rule is considered no valid, and an error is shown. If we need to link this way, we have to use auxiliary variables.
 
 # Other methods
