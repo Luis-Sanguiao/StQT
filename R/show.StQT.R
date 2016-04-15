@@ -24,7 +24,7 @@ setMethod(
   function(object){
 
     tab <- getRules(object)
-    width <- max(unlist(lapply(tab,nchar)),colnames(tab))
+    width <- max(unlist(lapply(tab,nchar)),nchar(colnames(tab)))
     if (width > 23) {
       width <- 23
       fcut <- function(x) {
