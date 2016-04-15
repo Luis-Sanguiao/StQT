@@ -119,7 +119,10 @@ setMethod(
           values <- ssplit(rules$output[i],FALSE)
           f <- functions[[rules$fun[i]]]
 
-          command <- paste0("xtemp <- x[",rules$domain[i],",f(",rules$input[i],")")
+          if (length(vars[is.na(values)]) > 1 || rules$by[i] != "")
+            command <- paste0("xtemp <- x[",rules$domain[i],",f(",rules$input[i],")")
+          else
+            command <- paste0("xtemp <- x[",rules$domain[i],",c(list(),f(",rules$input[i],"))")
           if (rules$by[i] != "") command <- paste0(command,",by = .(",rules$by[i],")]")
           else command <- paste0(command,"]")
           eval(parse(text = command))
