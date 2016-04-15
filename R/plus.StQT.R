@@ -32,7 +32,7 @@ setMethod(
 
     comparefun <- unlist(lapply(funs1,function(x) lapply(funs2,function(y) identical(x,y))))
     if (is.null(comparefun)) {
-      output.rules <- rbindlist(list(rules1,rules2))
+      output.rules <- rbindlist(list(rules1,rules2),use.names = TRUE)
       if (length(funs1) == 0) output.functions <- funs2
       else output.functions <- funs1
       output <- new(Class = 'StQT', Rules = output.rules, Functions = output.functions)
@@ -51,7 +51,7 @@ setMethod(
       if (any(vlogic)) rules2$fun[i] <- names(funs1)[which.max(vlogic)]
     }
 
-    output.rules <- rbindlist(list(rules1,rules2))
+    output.rules <- rbindlist(list(rules1,rules2),use.names = TRUE)
     output.functions <- c(funs1,selected2)
 
     output <- new(Class = 'StQT', Rules = output.rules, Functions = output.functions)
