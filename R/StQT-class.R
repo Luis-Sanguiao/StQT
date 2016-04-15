@@ -1,6 +1,6 @@
 #' S4 class of dataset transformations.
 #'
-#' Definition of an S4 class named \code{StQT} for dataset transformation.
+#' Definition of an S4 class named \code{StQT} for data transformation.
 #'
 #' The structure of the class \code{StQT} comprises 2 attributes:
 #' \itemize{
@@ -10,18 +10,28 @@
 #' The rules are represented with the following fields in the \code{Rules} data.frame.
 #' \itemize{
 #' \item{domain}{Specifies where the rule is applied}
-#' \item{output}{variable(s) de salida}
-#' \item{fun}{función a aplicar}
-#' \item{input}{variable(s) de entrada}
-#' \item{by}{agrupación}
-#' \item{order}{variable(s) por las que ordenar los datos}
-#' \item{key}{key of the output variables}
+#' \item{output}{Output variables}
+#' \item{fun}{Function to apply}
+#' \item{input}{Input variables}
+#' \item{by}{Variables to group by}
+#' \item{order}{Variables to order by}
+#' \item{key}{Key of the output variables}
 #' }
 #'
 #' @examples
-#' x <- new(Class = 'StQT', Rules=data.frame(domain=c("y<3",""),output=c("y=4","exponencial"),fun=c("sum","exp"),input=c("v","v"),by=c("x",""),stringsAsFactors=FALSE))
-#'
-#'
+#' T1 <- new(Class = 'StQT', Rules = data.frame(
+#'                              domain="",
+#'                              output="VAR",
+#'                              fun="*",
+#'                              input="SD,SD",
+#'                              by="",
+#'                              order="",
+#'                              key="",
+#'                              stringsAsFactors = FALSE),
+#'                              Functions = list(`*`=`*`))
+#' T1
+#' getRules(T1)
+#' getFunctions(T1)
 #'
 #' @export
 setClass(Class = "StQT",
@@ -38,19 +48,19 @@ setClass(Class = "StQT",
          validity = function(object){
 
            if (!setequal((names(object@Rules)),c("domain","output","fun","input","by","key","order")))
-             stop('[Validity StQT] Conjunto de reglas incorrecto.')
+             stop('[Validity StQT] Wrong rules set.')
 
            if (!all(unlist(lapply(object@Rules,is.character))))
-             stop('[Validity StQT] Las reglas deben definirse como variables character.')
+             stop('[Validity StQT] Rules fields must be class character.')
 
            if (!all(unlist(lapply(object@Functions,is.function))))
-             stop('[Validity StQT] La lista Functions tiene elementos que no son functiones.')
+             stop('[Validity StQT] Functions list contains non-function elements.')
 
            if (!setequal(RemoveInternal(object@Rules$fun),names(object@Functions)))
              if (length(setdiff(RemoveInternal(object@Rules$fun),names(object@Functions))) == 0)
-               warning('[Validity StQT] En la lista Functions figuran funciones innecesarias.')
+               warning('[Validity StQT] Functions list contains unneeded functions.')
              else
-               stop('[Validity StQT] Alguna de las funciones no figura en la lista Functions')
+               stop('[Validity StQT] Functions list does not contain all the functions in the rules.')
 
            return(TRUE)
 

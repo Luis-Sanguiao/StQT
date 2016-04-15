@@ -5,7 +5,7 @@
 \alias{StQT-class}
 \title{S4 class of dataset transformations.}
 \description{
-Definition of an S4 class named \code{StQT} for dataset transformation.
+Definition of an S4 class named \code{StQT} for data transformation.
 }
 \details{
 The structure of the class \code{StQT} comprises 2 attributes:
@@ -16,18 +16,28 @@ The structure of the class \code{StQT} comprises 2 attributes:
 The rules are represented with the following fields in the \code{Rules} data.frame.
 \itemize{
 \item{domain}{Specifies where the rule is applied}
-\item{output}{variable(s) de salida}
-\item{fun}{función a aplicar}
-\item{input}{variable(s) de entrada}
-\item{by}{agrupación}
-\item{order}{variable(s) por las que ordenar los datos}
-\item{key}{key of the output variables}
+\item{output}{Output variables}
+\item{fun}{Function to apply}
+\item{input}{Input variables}
+\item{by}{Variables to group by}
+\item{order}{Variables to order by}
+\item{key}{Key of the output variables}
 }
 }
 \examples{
-x <- new(Class = 'StQT', Rules=data.frame(domain=c("y<3",""),output=c("y=4","exponencial"),fun=c("sum","exp"),input=c("v","v"),by=c("x",""),stringsAsFactors=FALSE))
-
-
+T1 <- new(Class = 'StQT', Rules = data.frame(
+                             domain="",
+                             output="VAR",
+                             fun="*",
+                             input="SD,SD",
+                             by="",
+                             order="",
+                             key="",
+                             stringsAsFactors = FALSE),
+                             Functions = list(`*`=`*`))
+T1
+getRules(T1)
+getFunctions(T1)
 
 }
 
