@@ -12,7 +12,22 @@ an imputation, a summary or even a forecast are transformations. But a data merg
 are using a second data set (except for a self data merge which will be explained later). If we would happen to need a
 transformation that uses information from two data sets, we would have to join them into a single data set before.
 
-The 
+The main goals of this package are:
+
+* To make clear the steps of a transformation, fixing a few simple rules, which we can use to express any transformation
+as a sequence of simple steps. We should think that each rule is a function with some instructions about how you use it
+on the data.
+* To add an abstraction layer, which allow us to work with transformations without knowing how they work in the inside.
+With this package, once we have built a library of transformations (more or less basic), we should be able to combine
+them into new more complicated transformations.
+
+It is important to focus in the first objective when you write the rules of a transformation. The rules should be
+flexible enough to represent any transformation in a understandable way, but as usual there is nothing that prevents an
+unclear codification.
+
+To achieve the second main goal, we are going to implement several tools.
+
+
 
 # The representation
 It is strongly inspired in the syntax of operator := from data.table package. The main idea is to apply a set of rules
@@ -24,8 +39,13 @@ the rules read next section.
 
 Note that if we remove ``<domain>`` and ``<by>`` and put ``<fun>`` and ``<input>`` as the only elements of the rule we still
 can get any transformation (even with one rule). But this rules representation would be useless in that case, since you have
-a function (an R function) that does all the work. So, generally speaking: keep the functions as simple as possible and try
-to use the other fields of the rule to achieve that. And be conscious that a lower number of rules **is not** necessarily better.
+a function (an R function) that does all the work. And anyone who wants to know what the rule does, would have to examine
+carefully the function. So, generally speaking: keep the functions as simple as possible and try to use the other fields of
+the rule to achieve that. And be conscious that a lower number of rules **is not** necessarily better.
+
+So, a transformation object has two slots: a data.frame with the rules and a list of the functions called by the rules.
+The functions are inside the object because that way the object has all the information needed to make the transformation.
+You don't need to load the functions into the workspace or check dependencies, you just load the transformation an apply it.
 
 # Detailed syntax
 There are three types of rules in StQT:
@@ -39,13 +59,9 @@ require(StQT)
 dt <- data.table(Stratum = c("1","2","3"), SD = c(1.54,1.12,1.88))
 dt
 T1 <- NewStQT(data.frame(
-        domain = "",
         output = "VAR",
         fun = "*",
         input = "SD,SD",
-        by = "",
-        order = "",
-        key = "",
         stringsAsFactors = FALSE))
 TApply(dt,T1)[]
 ```
@@ -62,17 +78,28 @@ require(StQT)
 dt <- data.table(Region = c("1","2","3"), GDP = c(1.38,0.94,1.23))
 dt
 T1 <- NewStQT(data.frame(
-        domain = "",
         output = "Region='Total',GDP",
         fun = "sum",
         input = "GDP",
-        by = "",
-        order = "",
-        key = "",
         stringsAsFactors = FALSE))
 TApply(dt,T1)
 ```
 In this case ``<by>`` is empty, so we have only one group (the whole table) and in consequence we only bind one new row.
+
+In the other extreme situation we have one new column per row:
+```{r, warning=FALSE, message=FALSE}
+require(data.table)
+require(StQT)
+dt <- data.table(Region = c("1","2","3"), GDP = c(1.38,0.94,1.23))
+dt
+T1 <- NewStQT(data.frame(
+        output = "Copy=TRUE,GDP",
+        fun = "sum",
+        input = "GDP",
+        by = "Region",
+        stringsAsFactors = FALSE))
+TApply(dt,T1)
+```
 
 * Internal: These are not real functions but *special* codes in ``<fun>`` field that trigger concrete behaviors different to usual
             horizontal or vertical rules. They are *FunDelVar*, *FunDelRow* and *FunAutoLink* so far. Except for *FunDelRow*, we
