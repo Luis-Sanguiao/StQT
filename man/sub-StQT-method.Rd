@@ -3,31 +3,40 @@
 \docType{methods}
 \name{[,StQT-method}
 \alias{[,StQT-method}
-\title{Extrae partes de un objeto de clase StQT.}
+\title{Extracts parts of an StQT object.}
 \usage{
 \S4method{[}{StQT}(x, i, j, ..., drop = FALSE)
 }
 \arguments{
-\item{x}{objeto de clase \linkS4class{StQT} del que se van a extraer los
-elementos.}
+\item{x}{object of class \linkS4class{StQT} from which to extract element(s).}
 
-\item{i}{índices correspondientes a los elementos a extraer.}
+\item{i}{indices specifying elements to extract.}
 
-\item{drop}{Incluido por coherencia.}
+\item{drop}{Included by coherence.}
 }
 \value{
-Objeto de clase \linkS4class{StQT}, que consiste en un subconjunto del
- objeto \code{StQT} de entrada.
+Object of class \linkS4class{StQT}, with the subset of rules.
 }
 \description{
-\code{[} extrae o reemplaza partes de un objeto de clase \linkS4class{StQT}.
+\code{[} extracts parts of an object of class \linkS4class{StQT}.
 }
 \details{
-Se trata del método \code{[} para la clase \linkS4class{StQT}. Este método
-obtiene subconjuntos del objeto de clase \code{StQT} especificado como entrada.
+It is indeed the method \code{[} for the class \linkS4class{StQT}. This method
+returns an object of class \linkS4class{StQT} whose rules are the specified subset
+of the original rules.
 }
 \examples{
-
+rules <- data.frame(domain = c('!is.na(Variable)','is.na(Variable)',''),
+                    output = c('MediaVariable','Variable','MediaVariable'),
+                    fun =    c('mean','identity','FunDelVar'),
+                    input =  c('Variable','MediaVariable',''),
+                    by =     c('Estrato','',''),
+                    key =    c('Estrato','',''),
+                    stringsAsFactors = FALSE)
+imputa_media <- NewStQT(rules)
+imputa_media
+imputa_media[1:2]
+imputa_media[3:1]
 
 }
 
