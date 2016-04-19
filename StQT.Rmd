@@ -88,8 +88,7 @@ In this case ``<by>`` is empty, so we have only one group (the whole table) and 
 
 In the other extreme situation we have one new column per row:
 ```{r, warning=FALSE, message=FALSE}
-require(data.table)
-require(StQT)
+
 dt <- data.table(Region = c("1","2","3"), GDP = c(1.38,0.94,1.23))
 dt
 T1 <- NewStQT(data.frame(
@@ -103,9 +102,39 @@ TApply(dt,T1)
 
 * Internal: These are not real functions but *special* codes in ``<fun>`` field that trigger concrete behaviors different to usual
             horizontal or vertical rules. They are *FunDelVar*, *FunDelRow* and *FunAutoLink* so far. Except for *FunDelRow*, we
-            could write functions to get the same behavior (at least when applied to data.table objects), but they are anyways useful because
-            implement common tasks in a standard way.
+            could write functions to get the same behavior (at least when applied to data.table objects), but they are anyways useful
+            because they implement common tasks in a standard way which helps to make understandable the rules.
             
+*FunDelVar* removes the variables specified in output, *FunDelRow* removes the rows in ``<domain>`` and *FunAutoLink*
+copies the ``<input>`` variables to the ``<output>`` variables, linking rows according to the equality specified in
+domain. The equality must be like ``a == b & c == d & ...``, and be careful: in this case the equality is not commutative!
+When you put ``a==b`` you are linking each row with other row that has in variable *b* the same value than the original row has
+in variable *a*. So, if you swap *a* and *b*, you are making a different linkage. Now, let's see some examples:
+```{r, warning=FALSE, message=FALSE}
+dt <- data.table(Unit = 1:10, Value = rnorm(10), Next = c(2:10,NA))
+T1 <- NewStQT(data.frame(
+        domain = c("Next==Unit","","Value < 0"),
+        output = c("Value_next","Value_next",""),
+        fun = c("FunAutoLink","FunDelVar","FunDelRow"),
+        input = c("Value","",""),
+        stringsAsFactors = FALSE))
+dt
+TApply(dt,T1[1])
+dt
+TApply(dt,T1[2])
+dt
+TApply(dt,T1[3])
+dt
+```
+The examples also show how to use the operator ``[``, that applies a subset of the rules. Note that some rules
+modify the original data, but some others do not. *TApply* uses data.table methods by reference when possible, but
+sometimes they are unavailable (row insertion and deletion). I strongly recommend to assign the old table to the new one
+`dt <- TApply(dt, T1)` to avoid confusion. If you don't want to loose information just don't remove the data.
+
+In the first rule, we are storing the value of the next element according to *Next* field in the new variable
+*Value_next*. In the second one, we are removing the new column so we recover the original data.table. Finally
+we remove the rows where *Value* is negative, but as seen *dt* remains unchanged.
+
 There is also an ``<order>`` field which if not empty, orders the data by the variables specified.
 
 Note that ``<key>`` field is ignored unless we are transforming an StQ object (see next section).
