@@ -4,25 +4,32 @@
 \name{getFunctions}
 \alias{getFunctions}
 \alias{getFunctions,StQT-method}
-\title{Devuelve el slot Functions de un objeto de clase StQT.}
+\title{Returns slot \code{Functions} from an object of class \linkS4class{StQT}}
 \usage{
 getFunctions(object)
 
 \S4method{getFunctions}{StQT}(object)
 }
 \arguments{
-\item{object}{Objeto de clase \code{\linkS4class{StQT}} del que se desea
-extraer las funciones.}
+\item{object}{Object of class \code{\linkS4class{StQT}}}
 }
 \value{
-Una \code{\link{list}} con las funciones de transformación.
+A \code{\link{list}} corresponding to the slot \code{Functions} of the input parameter.
 }
 \description{
-\code{getFunctions} devuelve el slot \code{Functions} del input
-\code{\linkS4class{StQT}}.
+\code{getFunctions} extracts slot \code{Functions} from an \code{\linkS4class{StQT}} object.
 }
 \examples{
-
+rules <- data.frame(domain = c('!is.na(Variable)','is.na(Variable)',''),
+                    output = c('MediaVariable','Variable','MediaVariable'),
+                    fun =    c('mean','identity','FunDelVar'),
+                    input =  c('Variable','MediaVariable',''),
+                    by =     c('Estrato','',''),
+                    key =    c('Estrato','',''),
+                    stringsAsFactors = FALSE)
+T1 <- NewStQT(rules)
+T1
+getFunctions(T1)
 
 }
 

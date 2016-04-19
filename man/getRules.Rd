@@ -4,24 +4,30 @@
 \name{getRules}
 \alias{getRules}
 \alias{getRules,StQT-method}
-\title{Devuelve el slot Rules de un objeto de clase StQT.}
+\title{Returns slot \code{Rules} from an object of class \linkS4class{StQT}}
 \usage{
 getRules(object)
 
 \S4method{getRules}{StQT}(object)
 }
 \arguments{
-\item{object}{Objeto de clase \code{\linkS4class{StQT}} del que se desea
-extraer las reglas.}
+\item{object}{Object of class \code{\linkS4class{StQT}}}
 }
 \value{
-Un \code{\link{data.frame}} con las reglas de la transformación.
+A \code{\link{data.frame}} corresponding to the slot \code{Rules} of the input parameter.
 }
 \description{
-\code{getRules} devuelve el slot \code{Rules} del input
-\code{\linkS4class{StQT}}.
+\code{getRules} extracts slot \code{Rules} from an \code{\linkS4class{StQT}} object.
 }
 \examples{
+T1 <- NewStQT(data.frame(
+                domain = c("Next==Unit","","Value < 0"),
+                output = c("Value_next","Value_next",""),
+                   fun = c("FunAutoLink","FunDelVar","FunDelRow"),
+                 input = c("Value","",""),
+                         stringsAsFactors = FALSE))
+T1
+getRules(T1)
 
 
 }
