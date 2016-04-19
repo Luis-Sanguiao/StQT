@@ -22,5 +22,5 @@ Collate:
     'output.R'
     'plus.StQT.R'
     'show.StQT.R'
-Imports:
-    data.table
+Depends:
+    data.table, StQ
