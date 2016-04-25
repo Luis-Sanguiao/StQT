@@ -13,10 +13,9 @@
 #' \item{Column insertion}{Rows are calculated according output = fun (input)}
 #' }
 #' Parameter domain specifies the subset of the dataset where we are going to do the calculation.
-#' El parámetro by aplica la transformación por subtablas según los valores de las variables
-#' contenidas en dicho parámetro.
-#' El parámetro order aplica una ordenación de la tabla (útil para incrementar la velocidad),
-#' que se realiza previamente a la transformación correspondiente.
+#' Parameter by sets the variables where we are applying the rule by.
+#' Parameter order orders the table, previously to apply the transformation.
+#' Parameter key (irrelevant for data.table) sets which of the variables are qualifiers.
 #'
 #'
 #' @param x Object of class \linkS4class{StQ} or \linkS4class{data.table} with data
@@ -29,7 +28,30 @@
 #' data
 #'
 #' @examples
-#' x
+#' require(data.table)
+#' dt <- data.table(Region = c("1","2","3"), GDP = c(1.38,0.94,1.23))
+#' dt
+#' T1 <- NewStQT(data.frame(
+#'   output = "Region='Total',GDP",
+#'   fun = "sum",
+#'   input = "GDP",
+#'   stringsAsFactors = FALSE))
+#' TApply(dt,T1)
+#' require(StQ)
+#' data(ExampleQ)
+#' calibrate <- function(x,y) return(100*x/y)
+#' rules <- data.frame(domain = c('','Total != 100',''),
+#'                     output = c('Total','IASSLPCifraNeg','Total'),
+#'                        fun = c('sum','calibrate','FunDelVar'),
+#'                      input = c('IASSLPCifraNeg','IASSLPCifraNeg,Total',''),
+#'                         by = c('NOrden','',''),
+#'                        key = c('NOrden','',''),
+#'                          stringsAsFactors = FALSE)
+#' calibratepc <- NewStQT(rules)
+#' dcast_StQ(TApply(ExampleQ,calibratepc[1]),"Total")[abs(Total-100)>1e-6] # In some cases percents do not sum up 100%!
+#' ExampleQ2 <- TApply(ExampleQ,calibratepc)
+#' dcast_StQ(TApply(ExampleQ2,calibratepc[1]),"Total")[abs(Total-100)>1e-6] # After calibration they do!
+#'
 #' @export
 setGeneric("TApply", function(x,Tr){standardGeneric("TApply")})
 
