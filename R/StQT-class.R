@@ -8,14 +8,14 @@
 #' \item The attribute \code{Functions}, which is a list of the functions used in the rules.
 #' }
 #' The rules are represented with the following fields in the \code{Rules} data.frame.
-#' \itemize{
-#' \item{domain}{Specifies where the rule is applied}
-#' \item{output}{Output variables}
-#' \item{fun}{Function to apply}
-#' \item{input}{Input variables}
-#' \item{by}{Variables to group by}
-#' \item{order}{Variables to order by}
-#' \item{key}{Key of the output variables}
+#' \describe{
+#' \item{\strong{domain}}{Specifies where the rule is applied}
+#' \item{\strong{output}}{Output variables}
+#' \item{\strong{fun}}{Function to apply}
+#' \item{\strong{input}}{Input variables}
+#' \item{\strong{by}}{Variables to group by}
+#' \item{\strong{order}}{Variables to order by}
+#' \item{\strong{key}}{Key of the output variables}
 #' }
 #'
 #' @examples
