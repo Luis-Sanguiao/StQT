@@ -163,4 +163,37 @@ are going to use it to link them all. If such variable does not exist, that mean
 (in the sense that its qualifiers are not included in the other qualifiers), and there is not an unique way to link them. In this
 case the rule is considered no valid, and an error is shown. If we need to link this way, we have to use auxiliary variables.
 
+When you call TApply, the first step is to extract the data needed for the transformation, the second one to apply the rules in
+the extracted data, and the final step is to merge the transformed data with the unchanged data.
+
+## Data extraction
+Variables used in the rules are looked for in the StQ, grouped by set of qualifiers, cast and put in a list of data.table.
+Since each data.table contains variables that share qualifiers, the key in each data.table is the set of qualifiers. The purpose
+of this structure is to speed up by avoiding repeating cast operations. Variables not in the rules are kept in a copy of the
+data slot of the StQ.
+
+## Rules application
+This is by far the more complex step. We apply the following algorithm for each rule:
+
+* Extract the variables used in the rule from the list.
+* Select the main variable.
+* Merge the variables on the keys of the main variable.
+* Apply the transformation on the data.table. 
+* Set the key of the transformed data.table as ``<key>``. If ``<key>`` does not exist it defaults to the key of the
+main variable.
+* The output is made unique by key.
+* For new output variables they are merged in the data.table list. When the variables were already in the list, only non
+missing values are copied. *You can't set to NA any value*.
+* The DD file is updated with the new variables.
+
+Internal function FunDelVar, deletes the variables in any data.table of the list, and also removes them from the DD file.
+To keep referential integrity, it removes any variable qualified by them. Finally, any unneeded qualifier is deleted too.
+
+Internal function FunDelRow (** not implemented **) is intended to put NA in the ``<domain>`` specified.
+
+For the moment FunAutoLink is expected to work as is.
+
+## Data merge
+We just melt the data and rbind them. We also rbind the data slot with the remaining variables.
+
 # Other methods
