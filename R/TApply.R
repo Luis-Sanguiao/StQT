@@ -109,12 +109,12 @@ setMethod(
 
           selected <- expand(rules$input[i])
           fieldnames <- expand(rules$output[i])
-          xtemp <- x[,mget(link1)]
+          xtemp <- na.omit(x[,mget(link1)])
           setkeyv(xtemp,link1)
           setkeyv(x,link2)
           xdata <- x[xtemp,mget(selected)]
           setkeyv(x,link1)
-          x[,fieldnames := xdata,with = FALSE]
+          x[unique(xtemp),fieldnames := xdata,with = FALSE]
           next
         }
 
