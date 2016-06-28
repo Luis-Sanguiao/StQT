@@ -109,8 +109,9 @@ setMethod(
 
           selected <- expand(rules$input[i])
           fieldnames <- expand(rules$output[i])
-          xtemp <- unique(na.omit(x[,mget(link1)]))
-          xdata <- unique(na.omit(x[xtemp,mget(union(link2,selected)),on = setNames(link1,link2)]))
+          xtemp <- merge(unique(na.omit(x[,mget(link1)])),
+                         unique(na.omit(x[,mget(link2)])),by.x = link1, by.y = link2)
+          xdata <- unique(x[xtemp,mget(union(link2,selected)),on = setNames(link1,link2)])
 
           x[xdata,fieldnames := mget(paste0("i.",selected)),with = FALSE,on = setNames(link2,link1)]
 
