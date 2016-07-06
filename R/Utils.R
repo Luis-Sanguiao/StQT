@@ -173,7 +173,10 @@ DDadd <- function(variables,DD,DT) {
     return(x)
   }))
 
-  return(new(Class = "DD", VarNameCorresp = getVNC(DD), MicroData = microdata, Aggregates = DDdata))
+  microdata <- new(Class = 'DDdt', microdata)
+  DDdata <- new(Class = 'DDdt', DDdata)
+  VarNameCorresp = getVNC(DD) + DDdtToVNC(microdata,'MicroData') + DDdtToVNC(DDdata,'AggWeights')
+  return(new(Class = "DD", VarNameCorresp = VarNameCorresp, MicroData = microdata, Aggregates = DDdata))
 
 }
 

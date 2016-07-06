@@ -295,6 +295,7 @@ setMethod(
       return(x)
     }))
     setcolorder(DATA,c(setdiff(colnames(DATA),c("IDDD","Value")),"IDDD","Value"))
+    DATA <- new(Class = "Datadt", DATA)
     return(new(Class = "StQ", Data = DATA, DD = DD))
 
   }
