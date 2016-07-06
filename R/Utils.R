@@ -1,7 +1,7 @@
-# Removes internal functions from a character vector with function names
+# Removes internal functions and atomic expressions from a character vector with function names
 RemoveInternal <- function(x)
 {
-  return(setdiff(x,c("FunDelRow","FunDelVar","FunAutoLink")))
+  return(setdiff(x[!unlist(lapply(parse(text = x),is.atomic))],c("FunDelRow","FunDelVar","FunAutoLink")))
 }
 
 # expand splits comma separated variables from a string into a character vector

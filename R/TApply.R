@@ -123,7 +123,13 @@ setMethod(
 
         if (!grepl("=",rules$output[i]))
         {
-          f <- functions[[rules$fun[i]]]
+          if (rules$fun[i] %in% names(functions))
+            f <- functions[[rules$fun[i]]]
+          else {
+            f <- function() return(1)
+            body(f) <- substitute(return(x), list(x = eval(parse(text = rules$fun[i]))))
+          }
+
           outnames <- expand(rules$output[i])
 
           command <- paste0("x[",rules$domain[i],",outnames:=f(",rules$input[i],")")
@@ -139,7 +145,13 @@ setMethod(
           # Primero calculamos las filas a insertar
           vars <- ssplit(rules$output[i],TRUE)
           values <- ssplit(rules$output[i],FALSE)
-          f <- functions[[rules$fun[i]]]
+
+          if (rules$fun[i] %in% names(functions))
+            f <- functions[[rules$fun[i]]]
+          else {
+            f <- function() return(1)
+            body(f) <- substitute(return(x), list(x = eval(parse(text = rules$fun[i]))))
+          }
 
           if (length(vars[is.na(values)]) > 1 || rules$by[i] != "")
             command <- paste0("xtemp <- x[",rules$domain[i],",f(",rules$input[i],")")
