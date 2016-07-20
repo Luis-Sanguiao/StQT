@@ -250,34 +250,31 @@ setMethod(
       }
 
         # Extract variables
-      vars <- getVars(rules[i,][,c("domain","output","input","by","order")],DD)
-      vars <- setOrderVars(vars,DTList,DD)
-
-      if (is.null(vars)) stop("[StQT::TApply] There is no obvious way to link variables at rule ",i)
+      vars <- getVars(rules[i,][,c("domain","input","by","order")],DD)
+      vars <- setOrderVars(vars,DD)
 
         # Set data.table
       DT <- mergeDataTable(DTList,vars)
 
+       # Set qualifiers
+      if (rules$key[i] == "") ref <- key(DT)
+      else ref <- expand(rules$key[i])
+
+      # Restrict domain
       if (rules$domain[i] != "") DT <- DT[eval(parse(text = rules$domain[i])),]
 
         # Apply rule in data.table
       rows <- nrow(DT)
       DT <- TApply(DT,Tr[i])
+
       if (nrow(DT) > rows) DT <- DT[-1:-rows,]
 
         # Store new variables / Update DD
 
-      if (rules$key[i] == "") {
-         # Default qualifiers are those from main variable
-        DDdata <- getDDdata(DD)
-        ref <- unname(unlist(DDdata[Variable == vars[[1]][1] & Sort == "IDDD", getQuals(DDdata),with = FALSE]))
-        ref <- ref[ref != ""]
-      }
-      else ref <- expand(rules$key[i])
-
       DT <- DT[,c(ref, setdiff(ssplit(rules$output[i]),ref)),with = FALSE]
       setkeyv(DT,ref)
       DT <- unique(DT)
+      DT <- na.omit(DT,cols = setdiff(ssplit(rules$output[i]),ref))
 
       vlogic <- unlist(lapply(DTList,function(x) setequal(key(x),ref)))
       if (any(vlogic)) {

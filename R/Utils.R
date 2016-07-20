@@ -1,7 +1,8 @@
 # Removes internal functions and atomic expressions from a character vector with function names
 RemoveInternal <- function(x)
 {
-  return(setdiff(x[!unlist(lapply(parse(text = x),is.atomic))],c("FunDelRow","FunDelVar","FunAutoLink")))
+  x <- x[!unlist(lapply(x,function(x) tryCatch(is.atomic(parse(text = x)[[1]]),error = function(cond){return(FALSE)})))]
+  return(setdiff(x,c("FunDelRow","FunDelVar","FunAutoLink")))
 }
 
 # expand splits comma separated variables from a string into a character vector
@@ -50,7 +51,7 @@ getVars <- function(rules,DD)
 {
   DDdata <- getDDdata(DD)
 
-  varset <- unique(unlist(lapply(as.list(unname(unlist(rules))),ssplit,left = TRUE)))
+  varset <- unique(unlist(lapply(as.list(unname(unlist(rules))),expand)))
   linkvars <- unlist(DDdata[Variable %in% varset & Sort == "IDDD", getQuals(DDdata), with = FALSE])
   if (any(DDdata[Sort == "IDQual",Variable][1] %in% linkvars))
     varset <- union(varset,linkvars)
@@ -68,28 +69,21 @@ getVars <- function(rules,DD)
   return(output)
 }
 
-# setOrderVars puts main variable in first place
-setOrderVars <- function(vars,DTList,DD)
+# setOrderVars relocates aggregate variables at the end of the list
+setOrderVars <- function(vars,DD)
 {
   DDdata <- getDDdata(DD)
 
-  DTListQuals <- lapply(DTList,key)
   varsQuals <- lapply(lapply(vars,`[`,i = 1), function(x) {
     output <- unlist(DDdata[Variable == x & Sort == "IDDD", getQuals(DDdata),with = FALSE])
     output <- output[output != ""]
     return(output)
   })
   AggIDQuals <- setdiff(DDdata[Sort == "IDQual",Variable],getData(DD)[Sort == "IDQual",Variable])
-  allQuals <- setdiff(unique(unname(unlist(varsQuals))),AggIDQuals)
-  if (length(intersect(allQuals,DDdata[Sort == "IDQual",Variable])) == 0) allQuals <- unique(unname(unlist(varsQuals)))
-  vlogic <- unlist(lapply(varsQuals,function(x) setequal(intersect(x,allQuals),allQuals)))
-  if (any(vlogic))
-    output <- c(vars[which.max(vlogic)],vars[-which.max(vlogic)])
-  else return(NULL)
 
-  vlogic <- unlist(lapply(output[-1], function(x) return(length(intersect(x,AggIDQuals)) != 0)))
-  if (length(vlogic) == 0) return(output)
-  else return(c(output[1],output[-1][vlogic],output[-1][!vlogic]))
+  vlogic <- unlist(lapply(vars, function(x) return(length(intersect(x,AggIDQuals)) != 0)))
+  if (length(vlogic) == 0) return(vars)
+  else return(c(vars[vlogic],vars[!vlogic]))
 }
 
 
@@ -128,7 +122,12 @@ mergeDataTable <- function(DTList,vars) {
   })
 
   output <- newdata[[1]]
-  for (y in newdata[-1]) output <- merge(output,y,by = key(y))
+  for (y in newdata[-1]) {
+    merged <- merge(output, y, all = TRUE, by = intersect(key(output), key(y)), allow.cartesian = TRUE)
+    newkey <- union(key(output),key(y))
+    output <- rbind(merged, output,y, fill = TRUE)
+    setkeyv(output,newkey)
+  }
   return(output)
 }
 
