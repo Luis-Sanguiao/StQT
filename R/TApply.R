@@ -231,6 +231,9 @@ setMethod(
         else
           vlogic <- FALSE
         if (any(vlogic)) aggregates[,getQuals(aggregates)[-1][vlogic] := NULL, with = FALSE]
+        microdata <- new(Class = 'DDdt', microdata)
+        aggregates <- new(Class = 'DDdt', aggregates)
+        VarNameCorresp = DDdtToVNC(microdata,'MicroData') + DDdtToVNC(aggregates,'Aggregates')
         DD <- new(Class = "DD", VarNameCorresp = getVNC(DD), MicroData = microdata, Aggregates = aggregates)
 
         # Remove variables from DTList
