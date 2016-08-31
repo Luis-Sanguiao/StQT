@@ -38,19 +38,16 @@
 #'   stringsAsFactors = FALSE))
 #' TApply(dt,T1)
 #' require(StQ)
-#' data(ExampleQ)
-#' calibrate <- function(x,y) return(100*x/y)
-#' rules <- data.frame(domain = c('','Total != 100',''),
-#'                     output = c('Total','IASSLPCifraNeg','Total'),
-#'                        fun = c('sum','calibrate','FunDelVar'),
-#'                      input = c('IASSLPCifraNeg','IASSLPCifraNeg,Total',''),
-#'                         by = c('NOrden','',''),
-#'                        key = c('NOrden','',''),
+#' data(ExampleStQ)
+#' rules <- data.frame(domain = c('','Turnover > 0'),
+#'                     output = c('AggTurnover','LogTurnover'),
+#'                        fun = c('sum','log'),
+#'                      input = c('Turnover','Turnover'),
+#'                         by = c('NACE09',''),
+#'                        key = c('NACE09',''),
 #'                          stringsAsFactors = FALSE)
-#' calibratepc <- NewStQT(rules)
-#' dcast_StQ(TApply(ExampleQ,calibratepc[1]),"Total")[abs(Total-100)>1e-6] # In some cases percents do not sum up 100%!
-#' ExampleQ2 <- TApply(ExampleQ,calibratepc)
-#' dcast_StQ(TApply(ExampleQ2,calibratepc[1]),"Total")[abs(Total-100)>1e-6] # After calibration they do!
+#' T2 <- NewStQT(rules)
+#' (ExampleStQ2 <- TApply(ExampleStQ,T2))
 #'
 #' @export
 setGeneric("TApply", function(x,Tr){standardGeneric("TApply")})
