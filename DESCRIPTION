@@ -6,9 +6,12 @@ Date: 2015-12-15
 Author: Luis Sanguiao
 Maintainer: Luis Sanguiao <luis.sanguiao.sande@gmail.com>
 Description: More about what it does (maybe more than one line)
-License: What license is it under?
+License: file LICENSE
 LazyData: TRUE
 RoxygenNote: 5.0.1
+Imports:
+     data.table,
+     StQ
 Collate:
     'StQT-class.R'
     'Utils.R'
@@ -22,5 +25,4 @@ Collate:
     'output.R'
     'plus.StQT.R'
     'show.StQT.R'
-Depends:
-    data.table, StQ
+
