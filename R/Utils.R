@@ -1,3 +1,14 @@
+# Default behaviour changed in data.table package
+unique.data.table <- function(x,...)
+{
+    nameparm <- names(list(...))
+    if ("by" %in% nameparm)
+      getS3method("unique",class = "data.table",envir = as.environment("package:data.table"))(x, ...)
+    else
+      getS3method("unique",class = "data.table", envir = as.environment("package:data.table"))(x, by = key(x), ...)
+}
+
+
 # Removes internal functions and atomic expressions from a character vector with function names
 RemoveInternal <- function(x)
 {
