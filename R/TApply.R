@@ -93,7 +93,7 @@ setMethod(
         # FunDelVar elimina las columnas especificadas en output
         if (rules$fun[i] == "FunDelVar")
         {
-          x[,expand(rules$output[i]) := NULL]
+          x[,(expand(rules$output[i])) := NULL]
           next
         }
 
@@ -110,7 +110,7 @@ setMethod(
                          unique(na.omit(x[,mget(link2)])),by.x = link1, by.y = link2)
           xdata <- unique(x[xtemp,mget(union(link2,selected)),on = setNames(link1,link2)])
 
-          x[xdata,fieldnames := mget(paste0("i.",selected)),with = FALSE,on = setNames(link2,link1)]
+          x[xdata,(fieldnames) := mget(paste0("i.",selected)),on = setNames(link2,link1)]
 
           next
         }
@@ -129,9 +129,9 @@ setMethod(
 
           outnames <- expand(rules$output[i])
 
-          command <- paste0("x[",rules$domain[i],",outnames:=f(",rules$input[i],")")
-          if (rules$by[i] != "") command <- paste0(command,",by = .(",rules$by[i],"),with=FALSE]")
-          else command <- paste0(command,",with=FALSE]")
+          command <- paste0("x[",rules$domain[i],",(outnames):=f(",rules$input[i],")")
+          if (rules$by[i] != "") command <- paste0(command,",by = .(",rules$by[i],")]")
+          else command <- paste0(command,"]")
           eval(parse(text = command))
           next
         }
@@ -158,7 +158,7 @@ setMethod(
           else command <- paste0(command,"]")
           eval(parse(text = command))
           setnames(xtemp,(ncol(xtemp) - sum(is.na(values)) + 1):ncol(xtemp),vars[is.na(values)])
-          xtemp[,vars[!is.na(values)] := values[!is.na(values)]]
+          xtemp[,(vars[!is.na(values)]) := values[!is.na(values)]]
 
           # Se insertan las filas nuevas
 
@@ -225,12 +225,12 @@ setMethod(
           vlogic <- apply(microdata[,getQuals(microdata)[-1],with = FALSE],2,function(x) all(x == ""))
         else
           vlogic <- FALSE
-        if (any(vlogic)) microdata[,getQuals(microdata)[-1][vlogic] := NULL, with = FALSE]
+        if (any(vlogic)) microdata[,(getQuals(microdata)[-1][vlogic]) := NULL]
         if (length(getQuals(aggregates)) > 1)
           vlogic <- apply(aggregates[,getQuals(aggregates)[-1],with = FALSE],2,function(x) all(x == ""))
         else
           vlogic <- FALSE
-        if (any(vlogic)) aggregates[,getQuals(aggregates)[-1][vlogic] := NULL, with = FALSE]
+        if (any(vlogic)) aggregates[,(getQuals(aggregates)[-1][vlogic]) := NULL]
         microdata <- new(Class = 'DDdt', microdata)
         aggregates <- new(Class = 'DDdt', aggregates)
         VarNameCorresp = DDdtToVNC(microdata,'MicroData') + DDdtToVNC(aggregates,'Aggregates')
@@ -238,14 +238,14 @@ setMethod(
 
         # Remove variables from DTList
         correspvars <- lapply(DTList,function(x) intersect(setdiff(colnames(x),key(x)),vars))
-        mapply(function(x,y) {if (length(y)) x[,y := NULL, with = FALSE]
+        mapply(function(x,y) {if (length(y)) x[,(y) := NULL]
                               return(NULL)
                               },DTList,correspvars)
         # Keep only the data.table's with variables
         DTList <- DTList[unlist(lapply(DTList,function(x) !setequal(key(x),colnames(x))))]
         # Remove unneeded qualifiers in the unmodified DATA
         if (length(intersect(removequals,colnames(DATA))))
-          DATA[intersect(removequals,colnames(DATA)) := NULL,with = FALSE]
+          DATA[(intersect(removequals,colnames(DATA))) := NULL]
         next
       }
 
@@ -282,8 +282,8 @@ setMethod(
         newcols <- colnames(DTList[[which.max(vlogic)]])[grepl(".NEW",colnames(DTList[[which.max(vlogic)]]))]
         if (length(newcols)) {
           oldcols <- substr(newcols,1,nchar(newcols) - 4)
-          DTList[[which.max(vlogic)]][, c(oldcols,newcols) :=
-            c(mapply(combine,mget(oldcols),mget(newcols),SIMPLIFY = FALSE),rep(list(NULL),length(newcols))),with = FALSE]
+          DTList[[which.max(vlogic)]][, (c(oldcols,newcols)) :=
+            c(mapply(combine,mget(oldcols),mget(newcols),SIMPLIFY = FALSE),rep(list(NULL),length(newcols)))]
         }
       }
       else {
