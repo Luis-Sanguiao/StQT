@@ -19,8 +19,6 @@
 #'
 #' @include StQT-class.R
 #'
-#' @import methods
-#'
 #' @export
 setGeneric("NewStQT", function(x){standardGeneric("NewStQT")})
 

@@ -11,8 +11,7 @@ LazyData: TRUE
 RoxygenNote: 5.0.1
 Imports:
      data.table,
-     StQ,
-     methods
+     StQ
 Collate:
     'StQT-class.R'
     'Utils.R'
