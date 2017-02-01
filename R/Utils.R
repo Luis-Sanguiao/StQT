@@ -111,7 +111,7 @@ getDataTableList <-  function(object, vars)
   output <- lapply(vars,function(newvars) {
     quals <- unlist(DDdata[Variable == newvars[1] & Sort == "IDDD",getQuals(DDdata), with = FALSE])
     quals <- quals[quals != ""]
-    subtable <- data.table::dcast(Data, getFormula(quals), subset = .(IDDD %in% newvars), value.var = "Value")
+    subtable <- dcast(Data, getFormula(quals), subset = .(IDDD %in% newvars), value.var = "Value")
     subtable[,(colnames(subtable)) :=
         lapply(as.list(colnames(subtable)), function(x) as(get(x),unlist(DDdata[Variable == x,Class])[1]))]
     setkeyv(subtable,unname(quals))
