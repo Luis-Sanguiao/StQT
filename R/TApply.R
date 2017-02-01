@@ -175,7 +175,7 @@ setMethod(
 
 #' @rdname TApply
 #'
-#' @import StQ data.table methods
+#' @import StQ data.table
 #'
 #' @export
 setMethod(

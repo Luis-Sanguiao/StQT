@@ -33,8 +33,6 @@
 #' getRules(T1)
 #' getFunctions(T1)
 #'
-#' @import methods
-#'
 #' @export
 setClass(Class = "StQT",
          slots = c(Rules = 'data.frame', Functions = 'list'),
