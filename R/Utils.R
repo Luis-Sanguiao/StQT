@@ -147,7 +147,7 @@ DDadd <- function(variables,DD,DT) {
   #get Slots from objects
   microdata <- getData(DD)
   if (any(microdata[Sort == "IDQual",Variable] %in% key(DT))) DDdata <- microdata
-  else DDdata <- getAggr(DD)
+  else DDdata <- getAggregates(DD)
 
   variables <- union(variables,key(DT))
   variables <- setdiff(variables,DDdata$Variable)
@@ -164,7 +164,7 @@ DDadd <- function(variables,DD,DT) {
     incDD[Sort == "Qual",Sort := "NonIDQual"]
     DDdata <- rbindlist(list(DDdata,incDD),fill = TRUE)
     microdata <- DDdata
-    DDdata <- getAggr(DD)
+    DDdata <- getAggregates(DD)
   }
   else {
     incDD[Sort == "Qual" & (Variable %in% microdata[Sort == "IDDD",Variable]),Sort := "IDQual"]
@@ -205,7 +205,7 @@ sidelink <- function(x,left) {
 # getDDdata returns a data.table with information from DD slot
 
 getDDdata <- function(DD) {
-  DDdata <- rbindlist(list(getData(DD),getAggr(DD)),fill = TRUE, use.names = TRUE)
+  DDdata <- rbindlist(list(getData(DD),getAggregates(DD)),fill = TRUE, use.names = TRUE)
   DDdata <- as.data.table(lapply(DDdata,function(x) {
     x[is.na(x)] <- ""
     return(x)
