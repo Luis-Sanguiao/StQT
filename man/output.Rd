@@ -22,4 +22,3 @@ Character vector with the variable names
 \examples{
 x <- 1
 }
-

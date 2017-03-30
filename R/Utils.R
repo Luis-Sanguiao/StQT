@@ -1,3 +1,4 @@
+#' @import StQ data.table
 # Default behaviour changed in data.table package
 unique.data.table <- function(x,...)
 {
@@ -57,7 +58,7 @@ getFormula <- function(quals)
   return(as.formula(paste(paste0("`",paste(quals,collapse = "`+`"),"`"),"IDDD", sep = "~")))
 }
 
-# getVars returns a list with the vars in a transformation grouped by qualifiers
+# getVars returns a list with the vars in a transformation grouped by qualifiers from DD object
 getVars <- function(rules,DD)
 {
   DDdata <- getDDdata(DD)
@@ -80,23 +81,20 @@ getVars <- function(rules,DD)
   return(output)
 }
 
-# setOrderVars relocates aggregate variables at the end of the list
-setOrderVars <- function(vars,DD)
+# getVars2 returns a list with the vars in a transformation grouped by qualifiers from data.table list
+getVars2 <- function(rules,DTList)
 {
-  DDdata <- getDDdata(DD)
+  keyvalues <- lapply(DTList,key)
+  idddvalues <- mapply(setdiff,lapply(DTList,colnames),keyvalues,SIMPLIFY = FALSE)
 
-  varsQuals <- lapply(lapply(vars,`[`,i = 1), function(x) {
-    output <- unlist(DDdata[Variable == x & Sort == "IDDD", getQuals(DDdata),with = FALSE])
-    output <- output[output != ""]
-    return(output)
-  })
-  AggIDQuals <- setdiff(DDdata[Sort == "IDQual",Variable],getData(DD)[Sort == "IDQual",Variable])
+  varset <- unique(unlist(lapply(as.list(unname(unlist(rules))),expand)))
+  linkvars <- unique(unlist(keyvalues[unlist(lapply(idddvalues,function(x) length(intersect(x,varset)) != 0))]))
+  varset <- union(varset,linkvars)
+  output <- lapply(idddvalues,function(x) intersect(x,varset))
+  output <- output[unlist(lapply(output,function(x) length(x) != 0))]
 
-  vlogic <- unlist(lapply(vars, function(x) return(length(intersect(x,AggIDQuals)) != 0)))
-  if (length(vlogic) == 0) return(vars)
-  else return(c(vars[vlogic],vars[!vlogic]))
+  return(output)
 }
-
 
 # getDataTableList returns a list of data.tables from a StQ and a list of variables grouped by qualifier
 
@@ -124,7 +122,6 @@ getDataTableList <-  function(object, vars)
 # mergeDataTable creates the data.table where we will apply the rule from DTList and vars
 mergeDataTable <- function(DTList,vars) {
 
-
   newdata <- lapply(vars,function(x) {
     vlogic <- unlist(lapply(DTList, function(y) x[1] %in% setdiff(colnames(y),key(y))))
     output <- DTList[[which.max(vlogic)]][,c(key(DTList[[which.max(vlogic)]]),x),with = FALSE]
@@ -133,59 +130,54 @@ mergeDataTable <- function(DTList,vars) {
 
   output <- newdata[[1]]
   for (y in newdata[-1]) {
-    merged <- merge(output, y, all = TRUE, by = intersect(key(output), key(y)), allow.cartesian = TRUE)
-    newkey <- union(key(output),key(y))
+    merged <- merge(output, y, all = TRUE, by = intersect(colnames(output), colnames(y)), allow.cartesian = TRUE)
     output <- rbind(merged, output,y, fill = TRUE)
-    setkeyv(output,newkey)
   }
+  newkey <- setdiff(unique(unlist(lapply(newdata,key))),unlist(vars))
+  setkeyv(output,newkey)
   return(output)
 }
 
 # DDadd adds new variables to DD file
-DDadd <- function(variables,DD,DT) {
+DDadd <- function(DD,DTList) {
 
-  #get Slots from objects
-  microdata <- getData(DD)
-  if (any(microdata[Sort == "IDQual",Variable] %in% key(DT))) DDdata <- microdata
-  else DDdata <- getAggregates(DD)
+  keyvalues <- lapply(DTList,key)
+  idddvalues <- mapply(setdiff,lapply(DTList,colnames),keyvalues,SIMPLIFY = FALSE)
+  common <- intersect(unlist(keyvalues),unlist(idddvalues))
 
-  variables <- union(variables,key(DT))
-  variables <- setdiff(variables,DDdata$Variable)
-  if (length(variables) == 0) return(DD)
+  for (variable in common) lapply(DTList, function(x) if (variable %in% key(x)) setnames(x,variable,paste0("Agg",variable)))
+  keyvalues <- lapply(DTList,key)
 
-  incDD <- do.call(data.table,c(list(variables, ifelse(variables %in% key(DT),"Qual","IDDD"),
-                unname(unlist(lapply(DT[,variables,with = FALSE],class)))),
-                unname(split(unlist(lapply(variables %in% key(DT),
-                  function(x) if (x) return(rep("",length(key(DT)))) else return(key(DT)))),
-                rep(1:length(key(DT)),length(variables))))))
-  colnames(incDD) <- c("Variable","Sort","Class",paste0("Qual",1:(ncol(incDD) - 3)))
+  keyvalues <- lapply(keyvalues,function(x) union(getIDQual(DD,"MicroData"),x))
+  QualNumber <- max(unlist(lapply(keyvalues,length)))
 
-  if (any(microdata[Sort == "IDQual",Variable] %in% key(DT))) {
-    incDD[Sort == "Qual",Sort := "NonIDQual"]
-    DDdata <- rbindlist(list(DDdata,incDD),fill = TRUE)
-    microdata <- DDdata
-    DDdata <- getAggregates(DD)
-  }
-  else {
-    incDD[Sort == "Qual" & (Variable %in% microdata[Sort == "IDDD",Variable]),Sort := "IDQual"]
-    incDD[Sort == "Qual" & !(Variable %in% microdata[Sort == "IDDD",Variable]),Sort := "NonIDQual"]
-    DDdata <- rbindlist(list(DDdata,incDD),fill = TRUE)
-  }
+  cols <- union(colnames(getMicroData(DD)),paste0("Qual",1:QualNumber))
+  microdata <- setnames(as.data.table(matrix(character(),ncol = length(cols), nrow = 0)),cols)
 
-  DDdata <- as.data.table(lapply(DDdata,function(x) {
-    x[is.na(x)] <- ""
-    return(x)
-  }))
+  DDList <- lapply(1:length(DTList),function(i) {
+    output <- data.table(Variable = setdiff(c(keyvalues[[i]],idddvalues[[i]]),getIDQual(DD,"MicroData")))
+    output[Variable %in% idddvalues[[i]], Sort := "IDDD"]
+    output[Variable %in% keyvalues[[i]], Sort := "NonIDQual"]
+    classList <- lapply(DTList[[i]],class)
+    f <- function(x) unlist(classList[x])
+    output[,Class := f(Variable)]
+    QualNumber <- length(keyvalues[[i]])
+    output[Sort == "IDDD",(paste0("Qual",1:QualNumber)) := as.list(keyvalues[[i]])]
+    return(output)
+  })
+
+  microdata <- rbindlist(c(list(microdata),list(getMicroData(DD)[Variable %in% getIDQual(DD,"MicroData")]),DDList),fill = TRUE)
 
   microdata <- as.data.table(lapply(microdata,function(x) {
     x[is.na(x)] <- ""
     return(x)
   }))
 
-  microdata <- new(Class = 'DDdt', microdata)
-  DDdata <- new(Class = 'DDdt', DDdata)
-  VarNameCorresp = getVNC(DD) + DDdtToVNC(microdata,'MicroData') + DDdtToVNC(DDdata,'Aggregates')
-  return(new(Class = "DD", VarNameCorresp = VarNameCorresp, MicroData = microdata, Aggregates = DDdata))
+  microdata <- unique(microdata,by = "Variable")
+  microdata <- microdata[!(Variable %in% getMicroData(DD)$Variable) | Sort != "IDDD"]
+
+  VarNameCorresp = DDdtToVNC(microdata,'MicroData')
+  return(DD + BuildDD( list(VNC = VarNameCorresp, MicroData = microdata)))
 
 }
 
@@ -205,7 +197,7 @@ sidelink <- function(x,left) {
 # getDDdata returns a data.table with information from DD slot
 
 getDDdata <- function(DD) {
-  DDdata <- rbindlist(list(getData(DD),getAggregates(DD)),fill = TRUE, use.names = TRUE)
+  DDdata <- rbindlist(list(getMicroData(DD),getAggregates(DD)),fill = TRUE, use.names = TRUE)
   DDdata <- as.data.table(lapply(DDdata,function(x) {
     x[is.na(x)] <- ""
     return(x)

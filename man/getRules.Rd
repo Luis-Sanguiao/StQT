@@ -31,4 +31,3 @@ getRules(T1)
 
 
 }
-

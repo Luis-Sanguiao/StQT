@@ -23,4 +23,3 @@ Character vector with the variable names
 x <- 1
 
 }
-

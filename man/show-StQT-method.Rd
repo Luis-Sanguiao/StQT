@@ -27,4 +27,3 @@ to class \linkS4class{StQT}.
 show(new(Class = 'StQT'))
 
 }
-

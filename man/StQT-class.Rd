@@ -40,4 +40,3 @@ getRules(T1)
 getFunctions(T1)
 
 }
-

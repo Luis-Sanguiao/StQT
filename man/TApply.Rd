@@ -3,8 +3,8 @@
 \docType{methods}
 \name{TApply}
 \alias{TApply}
-\alias{TApply,StQ,StQT-method}
 \alias{TApply,data.table,StQT-method}
+\alias{TApply,StQ,StQT-method}
 \title{Applies a transformation object on a StQ or data.table.}
 \usage{
 TApply(x, Tr)
@@ -66,4 +66,3 @@ T2 <- NewStQT(rules)
 (ExampleStQ2 <- TApply(ExampleStQ,T2))
 
 }
-

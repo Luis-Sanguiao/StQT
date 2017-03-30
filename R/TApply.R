@@ -205,7 +205,7 @@ setMethod(
       if (rules$fun[i] == "FunDelVar") {
         vars <- expand(rules$output[i])
         # Remove variables from DD
-        microdata <- getData(DD)
+        microdata <- getMicroData(DD)
         aggregates <- getAggr(DD)
         microdata <- subset(microdata, !(Variable %in% vars))
         # We have to remove any var with missing qualifiers
@@ -231,10 +231,8 @@ setMethod(
         else
           vlogic <- FALSE
         if (any(vlogic)) aggregates[,(getQuals(aggregates)[-1][vlogic]) := NULL]
-        microdata <- new(Class = 'DDdt', microdata)
-        aggregates <- new(Class = 'DDdt', aggregates)
-        VarNameCorresp = DDdtToVNC(microdata,'MicroData') + DDdtToVNC(aggregates,'Aggregates')
-        DD <- new(Class = "DD", VarNameCorresp = getVNC(DD), MicroData = microdata, Aggregates = aggregates)
+        VarNameCorresp <- DDdtToVNC(microdata,'MicroData') + DDdtToVNC(aggregates, 'Aggregates')
+        DD <- BuildDD(list( VNC = getVNC(DD), MicroData = microdata, Aggregates = aggregates))
 
         # Remove variables from DTList
         correspvars <- lapply(DTList,function(x) intersect(setdiff(colnames(x),key(x)),vars))
@@ -250,8 +248,7 @@ setMethod(
       }
 
         # Extract variables
-      vars <- getVars(rules[i,][,c("domain","input","by","order")],DD)
-      vars <- setOrderVars(vars,DD)
+      vars <- getVars2(rules[i,][,c("domain","input","by","order")],DTList)
 
         # Set data.table
       DT <- mergeDataTable(DTList,vars)
@@ -289,10 +286,11 @@ setMethod(
       else {
         DTList <- c(DTList,list(DT))
       }
-      DD <- DDadd(ssplit(rules$output[i]),DD,DT)
     }
 
     # merge new data in x
+
+    DD <- DDadd(DD,DTList)
 
     DTList <- c(list(DATA),DTList)
 
@@ -304,8 +302,8 @@ setMethod(
       return(x)
     }))
     setcolorder(DATA,c(setdiff(colnames(DATA),c("IDDD","Value")),"IDDD","Value"))
-    DATA <- new(Class = "Datadt", DATA)
-    return(new(Class = "StQ", Data = DATA, DD = DD))
+
+    return(StQ(Data = DATA, DD = DD))
 
   }
 )

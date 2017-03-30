@@ -30,4 +30,3 @@ fulfill the equality: Tapply(Data,e1+e2) == Tapply(Tapply(Data,e1),e2)
 x <- 1
 
 }
-

@@ -3,9 +3,9 @@
 \docType{methods}
 \name{NewStQT}
 \alias{NewStQT}
-\alias{NewStQT,character-method}
-\alias{NewStQT,data.frame-method}
 \alias{NewStQT,missing-method}
+\alias{NewStQT,data.frame-method}
+\alias{NewStQT,character-method}
 \title{StQT class constructor}
 \usage{
 NewStQT(x)
@@ -37,4 +37,3 @@ NewStQT(data.frame(
 # NewStQT("<filename>")
 
 }
-

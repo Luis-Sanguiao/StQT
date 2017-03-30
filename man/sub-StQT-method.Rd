@@ -39,4 +39,3 @@ imputa_media[1:2]
 imputa_media[3:1]
 
 }
-

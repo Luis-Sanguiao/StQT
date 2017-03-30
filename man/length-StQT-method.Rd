@@ -22,4 +22,3 @@ This method overloads the method \code{\link{length}}.
 x <- 1
 
 }
-
