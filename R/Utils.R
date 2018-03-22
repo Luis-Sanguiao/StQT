@@ -13,7 +13,9 @@ unique.data.table <- function(x,...)
 # Removes internal functions and atomic expressions from a character vector with function names
 RemoveInternal <- function(x)
 {
-  x <- x[!unlist(lapply(x,function(x) tryCatch(is.atomic(parse(text = x)[[1]]),error = function(cond){return(FALSE)})))]
+  x <- x[!unlist(lapply(x,function(x) tryCatch(is.atomic(parse(text = x)[[1]]) ||
+                ((substr(x, 1, 1) == "-") && is.numeric(parse(text = x)[[1]][[2]])),
+                  error = function(cond){return(FALSE)})))]
   return(setdiff(x,c("FunDelRow","FunDelVar","FunAutoLink")))
 }
 
