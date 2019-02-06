@@ -26,4 +26,5 @@ Collate:
     'TApply.R'
     'output.R'
     'plus.StQT.R'
+    'rename.R'
     'show.StQT.R'
